@@ -91,7 +91,7 @@ export function PreviewBanner() {
     <div className="preview-banner">
       <p>
         <strong>Preview mode.</strong> Accounts and posts are saved in this browser only.{' '}
-        <a href="https://github.com/nweinberg97/kitside#launch-it" target="_blank" rel="noreferrer">Connect Supabase to launch</a>
+        <a href="https://github.com/nweinberg97/Kitside#launch-it" target="_blank" rel="noreferrer">Connect Supabase to launch</a>
       </p>
     </div>
   );

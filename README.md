@@ -100,14 +100,14 @@ With the Supabase CLI instead: `supabase link --project-ref akojekqdkcncsrckbtdh
 
 In **Authentication → URL Configuration**:
 
-- **Site URL:** `https://nweinberg97.github.io/kitside/`
-- **Redirect URLs:** add `https://nweinberg97.github.io/kitside/` and `http://localhost:5173/`
+- **Site URL:** `https://nweinberg97.github.io/Kitside/`
+- **Redirect URLs:** add `https://nweinberg97.github.io/Kitside/` and `http://localhost:5173/`
 
 In **Authentication → Providers → Email**: Supabase's built-in email sender is limited to a few emails an hour, which is fine for testing but not for a launch. Either turn off **Confirm email** for the first wave of neighbours, or add your own SMTP (Resend, Postmark, etc. all have free tiers) under **Authentication → Emails → SMTP settings**.
 
 ### 3. Turn on GitHub Pages
 
-Repo **Settings → Pages → Source: GitHub Actions**. Every push to `main` builds and deploys to `https://nweinberg97.github.io/kitside/`.
+Repo **Settings → Pages → Source: GitHub Actions**. Every push to `main` builds and deploys to `https://nweinberg97.github.io/Kitside/`.
 
 ### 4. (Optional) Social sign-in
 
