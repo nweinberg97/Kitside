@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import AnnouncementCard from '../components/AnnouncementCard.jsx';
+import { DemoButton } from '../components/Layout.jsx';
 import { Avatar, ChipGroup, EmptyState, ErrorState, SkeletonGrid } from '../components/ui.jsx';
 import { api } from '../lib/api.js';
 import { CATEGORIES } from '../lib/constants.js';
@@ -26,7 +27,7 @@ export default function Announcements() {
       <Composer onPosted={(p) => { setData((d) => [p, ...(d || [])]); setFreshId(p.id); }} />
 
       {loading ? <SkeletonGrid count={3} className="stack" /> : error ? <ErrorState error={error} onRetry={reload} /> : posts.length === 0 ? (
-        <EmptyState title="It’s quiet around here." body="Start the conversation." />
+        <EmptyState title="It’s quiet around here." body="Start the conversation." action={<DemoButton className="btn btn-demo">See the demo</DemoButton>} />
       ) : (
         <div className="stack board">
           {posts.map((p) => (

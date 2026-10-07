@@ -37,6 +37,7 @@ Deliberately small:
 - **Frontend:** React 19 + Vite, plain JSX and CSS. No UI framework, no state library. A ~50-line hash router (`src/lib/router.jsx`) so the build works on any static host.
 - **Backend:** [Supabase](https://supabase.com) free tier: Postgres, Auth and row-level security. No custom server.
 - **Hosting:** GitHub Pages via GitHub Actions (`.github/workflows/deploy.yml`).
+- **Demo mode:** the "See the demo" button switches a visitor into a sandbox full of sample neighbours, stored only in their browser. A yellow banner (and a "Leave demo" pill on phones) takes them back to the real community. The real database is never touched, so the live site can show only real members while anyone can still see what a busy Kitside looks like.
 - **Preview mode:** with no Supabase settings, the same app runs entirely in the browser on `localStorage` (`src/lib/backend/local.js`). Handy for local development and design reviews. Nothing is shared between people in this mode, and a banner says so.
 
 ```
@@ -90,7 +91,7 @@ The live site reads its Supabase settings from `.env.production` (already filled
 In the Supabase dashboard for the project, open **SQL Editor → New query** and run, in order:
 
 1. `supabase/migrations/20261006000000_kitside_init.sql`: creates the tables, policies and grants.
-2. `supabase/seed.sql`: adds the fictional example community (optional but recommended at launch).
+2. *(Optional)* `supabase/seed.sql`: adds the fictional example community to the database itself. You don't need it for the demo button, which uses sample data in the visitor's browser. The live site hides these rows while `VITE_SHOW_DEMO=false`.
 
 Both scripts are **non-destructive**: they never drop, delete or overwrite anything, run as a single transaction, and are safe to re-run. If a table with one of Kitside's names already exists with a different shape, the migration stops before changing anything and tells you which table and columns are the problem.
 
@@ -118,9 +119,9 @@ The Google, Apple and LinkedIn buttons are real Supabase OAuth calls, but each o
 
 LinkedIn sign-in proves someone controls a LinkedIn account; Kitside doesn't show it as a "verified" badge.
 
-### 5. When real people have joined
+### 5. Real community vs. demo
 
-Set `VITE_SHOW_DEMO=false` in `.env.production` to hide every example profile, activity and post. No database change needed; the demo rows can stay.
+The live site shows only real members (`VITE_SHOW_DEMO=false` in `.env.production`). Anyone who wants to see Kitside full of people presses **See the demo** on the home page, in empty states, or in the footer.
 
 ## Run it locally
 
@@ -138,11 +139,11 @@ Without a `.env.local`, local dev uses preview mode (browser-only data, seeded w
 | `VITE_SUPABASE_URL` | Supabase project URL. Empty = preview mode |
 | `VITE_SUPABASE_ANON_KEY` | Supabase publishable (anon) key. Public by design |
 | `VITE_AUTH_PROVIDERS` | Comma list of OAuth providers you've enabled: `google`, `apple`, `linkedin_oidc` |
-| `VITE_SHOW_DEMO` | `false` hides the fictional example content |
+| `VITE_SHOW_DEMO` | Live site only: `true` also shows example rows stored in the database by `seed.sql`. The demo button works either way |
 
 ## Demo data
 
-Every example person, activity and post is **fictional** and lives in `src/lib/seed.js`. In the UI they carry an "Example" tag. There are 14 people (a mix of founders, engineers, designers, PMs, creatives, a physio who's just curious), 9 weekly activities and 10 bulletin posts. Example activities repeat weekly (`roll_demo_activities()`), so the schedule never looks stale. Real places mentioned (Point Grey Road, Kits Beach, West 4th, Pacific Spirit) are public places used as examples only.
+Every example person, activity and post is **fictional** and lives in `src/lib/seed.js`. The "See the demo" sandbox loads it fresh each time someone enters. In the UI they carry an "Example" tag. There are 14 people (a mix of founders, engineers, designers, PMs, creatives, a physio who's just curious), 9 weekly activities and 10 bulletin posts. Example activities repeat weekly (`roll_demo_activities()`), so the schedule never looks stale. Real places mentioned (Point Grey Road, Kits Beach, West 4th, Pacific Spirit) are public places used as examples only.
 
 After editing `seed.js`, run `npm run seed:sql` to regenerate `supabase/seed.sql`.
 

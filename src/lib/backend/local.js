@@ -5,9 +5,11 @@
  * between people. Passwords are hashed, but this is NOT a secure auth system;
  * it only ever protects data that already sits on the same device.
  */
+import { MODE } from '../config.js';
 import { DEMO_PROFILES, DEMO_ACTIVITIES, DEMO_ANNOUNCEMENTS, nextOccurrence } from '../seed.js';
 
-const KEY = 'kitside:preview:v1';
+// The demo sandbox and local preview keep separate copies.
+const KEY = MODE === 'demo' ? 'kitside:demo:v1' : 'kitside:preview:v1';
 const listeners = new Set();
 const wait = (ms = 120) => new Promise((r) => setTimeout(r, ms)); // makes loading states visible, like a network would
 

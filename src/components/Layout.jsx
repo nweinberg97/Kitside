@@ -1,4 +1,4 @@
-import { api } from '../lib/api.js';
+import { enterDemo, exitDemo, MODE, SHOW_DEMO } from '../lib/config.js';
 import { DISCLAIMER } from '../lib/constants.js';
 import { Link } from '../lib/router.jsx';
 import { useSession } from '../state/session.jsx';
@@ -40,6 +40,11 @@ export function TopNav({ route, overlay }) {
           ))}
         </nav>
         <div className="topnav-end">
+          {MODE === 'demo' && (
+            <button type="button" className="demo-pill" onClick={() => exitDemo('/')} aria-label="Leave the demo and go back to the real Kitside">
+              Leave demo
+            </button>
+          )}
           {loading ? null : profile ? (
             <Link to="/me" className="me-link" aria-current={route.name === 'me' ? 'page' : undefined}>
               <Avatar profile={profile} size={30} />
@@ -85,8 +90,28 @@ export function BottomNav({ route }) {
   );
 }
 
+export function DemoButton({ className = 'btn btn-demo btn-lg', children = 'See the demo' }) {
+  if (MODE !== 'live') return null;
+  return (
+    <button type="button" className={className} onClick={() => enterDemo('/')}>
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.8v10.4L13 8z" fill="currentColor" /></svg>
+      <span>{children}</span>
+    </button>
+  );
+}
+
 export function PreviewBanner() {
-  if (api.mode !== 'preview') return null;
+  if (MODE === 'demo') {
+    return (
+      <div className="preview-banner demo-banner">
+        <p>
+          <strong>You’re in the demo.</strong> These neighbours are made up, and anything you do here stays in this browser.
+        </p>
+        <button type="button" className="demo-exit" onClick={() => exitDemo('/')}>Back to the real Kitside</button>
+      </div>
+    );
+  }
+  if (MODE !== 'preview') return null;
   return (
     <div className="preview-banner">
       <p>
@@ -108,9 +133,10 @@ export function Footer() {
         <nav className="footer-links" aria-label="Footer">
           {NAV.map((n) => <Link key={n.to} to={n.to}>{n.label}</Link>)}
           <Link to="/join">Join Kitside</Link>
+          {MODE === 'live' && <DemoButton className="text-btn footer-demo">See the demo</DemoButton>}
         </nav>
         <p className="footer-fine">
-          {DISCLAIMER} People, activities and posts marked “Example” are fictional and show how Kitside works.
+          {DISCLAIMER}{(MODE !== 'live' || SHOW_DEMO) && ' People, activities and posts marked “Example” are fictional and show how Kitside works.'}{' '}
           Kitside only ever shows neighbourhood-level locations.
         </p>
       </div>

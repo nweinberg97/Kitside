@@ -1,23 +1,24 @@
 /*
  * The one data API the UI talks to. It picks a backend:
- *   - Supabase when VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY are set (live, shared)
- *   - localStorage otherwise (preview mode, this browser only)
- * and applies the VITE_SHOW_DEMO switch so demo content can be hidden at launch.
+ *   - live:    Supabase (VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY set). The real, shared community.
+ *   - demo:    a visitor pressed "See the demo". Sample neighbours in this browser only.
+ *   - preview: no Supabase configured (local development). Also browser-only.
+ * In live mode, VITE_SHOW_DEMO=false keeps any example rows in the database out of sight.
  */
-import { IS_LIVE, SHOW_DEMO } from './config.js';
+import { MODE, SHOW_DEMO } from './config.js';
 import { localBackend } from './backend/local.js';
 
 let backendPromise;
 const backend = () =>
-  (backendPromise ||= IS_LIVE
+  (backendPromise ||= MODE === 'live'
     ? import('./backend/supabase.js').then((m) => m.supabaseBackend)
     : Promise.resolve(localBackend));
 
 const call = (name) => async (...args) => (await backend())[name](...args);
-const withoutDemo = (rows) => (SHOW_DEMO ? rows : rows.filter((r) => !r.isDemo));
+const withoutDemo = (rows) => (MODE !== 'live' || SHOW_DEMO ? rows : rows.filter((r) => !r.isDemo));
 
 export const api = {
-  mode: IS_LIVE ? 'live' : 'preview',
+  mode: MODE,
   getUser: call('getUser'),
   onAuthChange: (fn) => {
     let off = () => {};

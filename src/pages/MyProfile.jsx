@@ -136,11 +136,11 @@ export default function MyProfile() {
         )}
       </section>
 
-      {api.mode === 'preview' && (
+      {api.mode !== 'live' && (
         <section className="profile-section">
-          <h2>Preview data</h2>
-          <p className="muted">Everything here lives in this browser. Start over to wipe your account and restore the example community.</p>
-          <button className="btn btn-quiet" onClick={async () => { if (window.confirm('Delete your preview account and start over?')) { await api.resetPreview(); navigate('/'); } }}>
+          <h2>{api.mode === 'demo' ? 'Demo data' : 'Preview data'}</h2>
+          <p className="muted">Everything here lives in this browser. Start over to wipe your account and restore the sample community.</p>
+          <button className="btn btn-quiet" onClick={async () => { if (window.confirm('Delete this browser-only account and start over?')) { await api.resetPreview(); navigate('/'); } }}>
             Start over
           </button>
         </section>

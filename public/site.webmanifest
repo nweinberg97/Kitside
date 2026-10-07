@@ -1,0 +1,15 @@
+{
+  "name": "Kitside",
+  "short_name": "Kitside",
+  "description": "Good people, right nearby. A local community for people in Kitsilano.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ECEFE9",
+  "theme_color": "#17302A",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

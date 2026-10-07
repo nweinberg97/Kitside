@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { DemoButton } from '../components/Layout.jsx';
 import PersonCard from '../components/PersonCard.jsx';
 import { ChipGroup, EmptyState, ErrorState, SkeletonGrid } from '../components/ui.jsx';
 import { api } from '../lib/api.js';
@@ -27,14 +28,16 @@ export default function People() {
       <ChipGroup label="Filter people" options={PEOPLE_FILTERS} value={filter} onChange={setFilter} />
 
       {!user && api.mode === 'live' && (
-        <p className="notice">You’re seeing example members. <Link to="/join">Join Kitside</Link> to see the real neighbours who’ve signed up.</p>
+        <p className="notice">Members’ profiles are visible to other members. <Link to="/join">Join Kitside</Link> to see who’s signed up.</p>
       )}
 
       {loading ? <SkeletonGrid /> : error ? <ErrorState error={error} onRetry={reload} /> : people.length === 0 ? (
         <EmptyState
-          title="Nobody matches that filter yet."
-          body="Try widening the circle."
-          action={<button className="btn btn-quiet" onClick={() => setFilter('all')}>Show everyone</button>}
+          title={filter === 'all' ? 'The first neighbours are joining now.' : 'Nobody matches that filter yet.'}
+          body={filter === 'all' ? 'Make a profile and be one of the first faces here.' : 'Try widening the circle.'}
+          action={filter === 'all'
+            ? <DemoButton className="btn btn-demo">See the demo</DemoButton>
+            : <button className="btn btn-quiet" onClick={() => setFilter('all')}>Show everyone</button>}
         />
       ) : (
         <div className="grid-people">

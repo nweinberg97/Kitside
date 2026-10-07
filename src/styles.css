@@ -486,3 +486,27 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--b
 .field { align-content: start; }
 .composer input.composer-input { border: 0; background: transparent; box-shadow: none; min-height: 0; padding: 8px 4px; font-size: 21px; }
 @media (max-width: 760px) { .composer input.composer-input { font-size: 19px; } }
+
+/* ---------- Demo mode ---------- */
+.btn-demo { background: transparent; border-color: transparent; color: var(--ink); padding: 0 14px; }
+.btn-demo svg { color: var(--kelp); }
+.btn-demo:hover { background: rgba(23, 48, 42, .06); color: var(--ink); }
+.demo-banner { background: var(--sun); color: var(--ink); display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px 16px; }
+.demo-banner strong { color: var(--ink); }
+.demo-exit { background: var(--ink); color: var(--paper); border: 0; border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.demo-exit:hover { background: #0F241F; }
+.first-neighbours { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px 32px; padding: 26px 28px; border: 1.5px dashed var(--line); border-radius: var(--r-card); }
+.first-neighbours h3 { font-size: 22px; }
+.first-neighbours p { margin-top: 6px; color: var(--ink-2); max-width: 40em; }
+.first-neighbours-actions, .empty-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.footer-demo { font-size: 15px; color: inherit; font-weight: 400; padding: 0; text-decoration: none; }
+.footer-demo:hover { text-decoration: underline; }
+.route-home .footer .footer-demo { color: #DCE6E0; }
+@media (max-width: 760px) {
+  .hero-actions .btn-demo { flex-basis: 100%; }
+  .first-neighbours { padding: 20px; }
+}
+.footer-demo svg { display: none; }
+.demo-pill { background: var(--sun); color: var(--ink); border: 0; border-radius: 999px; padding: 7px 12px; font-size: 13px; font-weight: 600; cursor: pointer; margin-right: 4px; }
+.demo-pill:hover { background: #F5C364; }
+@media (min-width: 761px) { .demo-pill { display: none; } }

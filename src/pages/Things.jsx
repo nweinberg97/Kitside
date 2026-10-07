@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import ActivityCard from '../components/ActivityCard.jsx';
+import { DemoButton } from '../components/Layout.jsx';
 import { ChipGroup, EmptyState, ErrorState, Field, Modal, SkeletonGrid } from '../components/ui.jsx';
 import { api } from '../lib/api.js';
 import { CATEGORIES, DISCLAIMER } from '../lib/constants.js';
@@ -47,7 +48,7 @@ export default function Things() {
         <EmptyState
           title="Nothing planned yet."
           body="Be the person who starts something."
-          action={<button className="btn btn-primary" onClick={start}>Create an activity</button>}
+          action={<div className="empty-actions"><button className="btn btn-primary" onClick={start}>Create an activity</button><DemoButton className="btn btn-demo">See the demo</DemoButton></div>}
         />
       ) : (
         <div className="day-groups">
