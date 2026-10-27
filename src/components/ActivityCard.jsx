@@ -18,10 +18,10 @@ export default function ActivityCard({ activity, compact = false, onDeleted }) {
   const isHost = user && activity.hostId === user.id;
 
   async function remove() {
-    if (!window.confirm('Cancel this activity? People who said they’re in will no longer see it.')) return;
+    if (!window.confirm('Cancel this event? People who said they’re in will no longer see it.')) return;
     try {
       await api.deleteActivity(activity.id);
-      toast('Activity cancelled.');
+      toast('Event cancelled.');
       onDeleted?.(activity.id);
     } catch (e) { toast(e.message, 'error'); }
   }
@@ -38,7 +38,7 @@ export default function ActivityCard({ activity, compact = false, onDeleted }) {
           {activity.isDemo && <DemoTag />}
           {!compact && (
             <MoreMenu items={[
-              isHost && { label: 'Cancel activity', danger: true, onSelect: remove },
+              isHost && { label: 'Cancel event', danger: true, onSelect: remove },
               user && !isHost && { label: 'Report', onSelect: () => setReporting(true) },
             ]} />
           )}
@@ -64,7 +64,7 @@ export default function ActivityCard({ activity, compact = false, onDeleted }) {
           />
         </div>
       </div>
-      {reporting && <ReportDialog targetType="activity" targetId={activity.id} subject="this activity" onClose={() => setReporting(false)} />}
+      {reporting && <ReportDialog targetType="activity" targetId={activity.id} subject="this event" onClose={() => setReporting(false)} />}
     </article>
   );
 }

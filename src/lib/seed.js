@@ -10,9 +10,15 @@
  *   - preview mode (no Supabase) loads it straight into localStorage
  *   - `npm run seed:sql` turns it into supabase/seed.sql
  *
+ * Business names (cafés, restaurants) are made up too. Public places
+ * (Kits Beach, Hadden Park, West 4th) are real and used only as examples.
+ *
  * Every demo record is flagged `isDemo: true` and shows an "Example" tag in the UI.
- * Hide all of it with VITE_SHOW_DEMO=false once real neighbours have joined.
  */
+
+// Members who can host events, and who invited whom.
+const HOSTS = [2, 3, 12, 14];
+const INVITED_BY = { 2: 1, 3: 1, 4: 3, 5: 2, 6: 3, 7: 2, 8: 3, 9: 14, 10: 12, 11: 3, 12: 1, 13: 5, 14: 2 };
 
 const id = (n) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
 
@@ -127,125 +133,79 @@ export const DEMO_PROFILES = [
   workingOn: p.workingOn,
   isRemote: p.isRemote,
   linkedinUrl: '',
+  instagram: '',
+  contactEmail: `${p.name.split(' ')[0].toLowerCase()}@example.com`,
+  weeklyNote: true,
+  isHost: HOSTS.includes(p.n),
+  isAdmin: false,
+  invitedBy: p.n === 1 ? null : id(INVITED_BY[p.n] || 1),
   avatarUrl: '',
   avatarHue: p.hue,
   isDemo: true,
+  createdAt: new Date(Date.now() - (30 - p.n) * 86400e3).toISOString(),
 }));
 
 const pid = (n) => id(n);
 
-// weekday: 0 = Sunday … 6 = Saturday. Demo activities recur weekly so the
-// community never looks stale.
+/** Invite code that works in the demo sandbox. */
+export const DEMO_INVITE = 'KITS-DEMO';
+
+// weekday: 0 = Sunday … 6 = Saturday. Demo events recur weekly so the demo never looks stale.
 export const DEMO_ACTIVITIES = [
   {
-    n: 101, host: 14, title: 'Morning run', category: 'Move', location: 'Point Grey Road', weekday: 6, time: '09:00',
-    description: 'Easy-paced 5K out and back along the water. No pressure, no watches required. Coffee after for anyone who wants it.',
-    interested: [1, 4, 6, 9, 12, 3],
+    n: 101, host: 2, title: 'Build & Break Bread', category: 'Build', location: 'Tidewater Café, West 4th', weekday: 3, time: '16:00',
+    description: 'Bring whatever you’re working on. Quick round of what everyone’s on, then heads down. Dinner after for whoever’s staying.',
+    isSession: true, dinnerPlace: 'Larch Street Kitchen', dinnerTime: '18:30', dinnerMin: 3,
+    interested: [2, 1, 8, 11, 13, 3], dinner: [2, 8, 11],
   },
   {
-    n: 102, host: 2, title: 'Build together', category: 'Work', location: 'A café on West 4th', weekday: 3, time: '10:00',
-    description: 'Bring a side project and work alongside a few other people for the morning. Quiet table, headphones welcome.',
-    interested: [8, 13, 11, 1],
+    n: 102, host: 14, title: 'Saturday run', category: 'Move', location: 'Point Grey Road', weekday: 6, time: '09:00',
+    description: 'Easy 5K out and back along the water. Coffee after for anyone who wants it.',
+    interested: [14, 1, 4, 6, 9, 12],
   },
   {
-    n: 103, host: 4, title: 'Product people dinner', category: 'Eat', location: 'Kitsilano', weekday: 4, time: '19:00',
-    description: 'Casual dinner for people who work in or around product. No decks, no pitches. Spot shared with those who say they’re in.',
-    interested: [1, 3, 6, 8, 11, 12, 14, 7],
+    n: 103, host: 12, title: 'Sunset sea swim', category: 'Move', location: 'Kits Beach', weekday: 2, time: '18:15',
+    description: 'A short dip near shore. Wetsuits welcome.',
+    interested: [12, 10, 5, 3],
   },
   {
-    n: 104, host: 9, title: 'Outdoor bootcamp', category: 'Move', location: 'Kits Beach park', weekday: 0, time: '11:00',
-    description: 'A friendly community workout on the grass. Every level welcome. Bring water and something to lie on.',
-    interested: [10, 14, 6, 3, 4],
+    n: 104, host: 3, title: 'Founder breakfast', category: 'Eat', location: 'West 4th', weekday: 5, time: '08:00',
+    description: 'Eggs and one honest question each about what’s hard right now. Six seats.',
+    interested: [3, 11, 8, 2],
   },
-  {
-    n: 105, host: 11, title: 'Side project night', category: 'Build', location: 'Kitsilano', weekday: 4, time: '18:30',
-    description: 'Bring whatever you’re building, even if it’s a spreadsheet. Five-minute show-and-tell, then heads down.',
-    interested: [2, 5, 7, 8, 12, 13, 1],
-  },
-  {
-    n: 106, host: 12, title: 'Sunset sea swim', category: 'Move', location: 'Kits Beach', weekday: 2, time: '18:15',
-    description: 'A short dip and a long shiver. Wetsuits welcome, bravado optional. We stick close to shore.',
-    interested: [10, 5, 3],
-  },
-  {
-    n: 107, host: 3, title: 'Coffee walk along the seawall', category: 'Social', location: 'Kits Point to Vanier Park', weekday: 0, time: '08:30',
-    description: 'Grab a coffee, walk the water, talk about whatever. A good one if you’re new around here.',
-    interested: [10, 8, 4, 11],
-  },
-  {
-    n: 108, host: 6, title: 'Pacific Spirit trail walk', category: 'Explore', location: 'Pacific Spirit Regional Park', weekday: 6, time: '10:30',
-    description: 'About 90 minutes on the forest trails at a chatty pace. We’ll meet at a trailhead off West 16th.',
-    interested: [13, 10, 7, 14, 2],
-  },
-  {
-    n: 109, host: 13, title: 'Sunday jam', category: 'Social', location: 'West Point Grey', weekday: 0, time: '15:00',
-    description: 'Bring an instrument or don’t. Mostly folk and whatever someone can carry. Snacks provided by whoever remembers.',
-    interested: [5, 4, 12],
-  },
-].map((a) => ({ ...a, id: id(a.n), hostId: pid(a.host), interested: a.interested.map(pid), isDemo: true }));
+].map((a) => ({
+  isSession: false, dinnerPlace: '', dinnerTime: null, dinnerMin: 3,
+  ...a, id: id(a.n), hostId: pid(a.host), interested: a.interested.map(pid), dinner: (a.dinner || []).map(pid), isDemo: true,
+}));
 
-export const DEMO_ANNOUNCEMENTS = [
-  {
-    n: 201, author: 14, hoursAgo: 3, category: 'Move', location: 'Point Grey Road', time: '09:00',
-    title: 'Anyone up for a run Saturday morning?',
-    details: 'Thinking Point Grey Road around 9. Easy pace, coffee after.',
-    interested: [9, 1, 6],
-  },
-  {
-    n: 202, author: 11, hoursAgo: 9, category: 'Build', location: '',
-    title: 'Looking for a designer',
-    details: 'I’m building inventory software for independent bike shops and would love to find someone who wants to explore it with me. Coffee on me while we figure out if it’s a fit.',
-    interested: [1, 12],
-  },
-  {
-    n: 203, author: 2, hoursAgo: 20, category: 'Work', location: 'A café on West 4th', time: '10:00',
-    title: 'Anyone working from somewhere tomorrow?',
-    details: 'Thinking a café on West 4th around 10. Quiet table, headphones optional.',
-    interested: [8, 14, 13, 4],
-  },
-  {
-    n: 204, author: 8, hoursAgo: 28, category: 'Build', location: 'Kitsilano',
-    title: 'Anyone interested in a side-project night?',
-    details: 'A few of us are thinking Thursday evening. Bring whatever you’re building.',
-    interested: [2, 7, 11, 5, 13],
-  },
-  {
-    n: 205, author: 10, hoursAgo: 34, category: 'Social', location: 'Kitsilano',
-    title: 'New to Kits and would love a walking group',
-    details: 'Moved here from Lisbon in August. Free most evenings after 6 and happy to walk anywhere near the water.',
-    interested: [3, 8, 12, 6, 4, 14],
-  },
-  {
-    n: 206, author: 12, hoursAgo: 52, category: 'Build', location: '',
-    title: 'Looking for 5 people to chat with about finding things to do locally',
-    details: 'Twenty minutes over coffee, and I’m buying. It’s for a side project, not a company.',
-    interested: [10, 4],
-  },
-  {
-    n: 207, author: 7, hoursAgo: 70, category: 'Eat', location: 'Fairview',
-    title: 'Making far too much curry on Sunday',
-    details: 'Big pot of chicken curry. Room for four at the table. Bring a dessert, or just yourself.',
-    interested: [2, 5, 13, 6],
-  },
-  {
-    n: 208, author: 6, hoursAgo: 96, category: 'Move', location: '',
-    title: 'Climbing partner wanted',
-    details: 'Bouldering Tuesday and Thursday evenings. Beginner-friendly. I’m not great either.',
-    interested: [9, 1],
-  },
-  {
-    n: 209, author: 3, hoursAgo: 120, category: 'Build', location: 'Kitsilano',
-    title: 'Happy to give feedback on your pitch',
-    details: 'Second-time founder. Thirty minutes on a coffee walk, no strings. Especially keen to help anyone doing consumer health.',
-    interested: [11, 4, 8],
-  },
-  {
-    n: 210, author: 13, hoursAgo: 150, category: 'Social', location: 'West Point Grey',
-    title: 'Looking for a drummer, any level',
-    details: 'Very casual Sunday afternoon jams. We play loudly and not especially well.',
-    interested: [5],
-  },
-].map((a) => ({ ...a, id: id(a.n), authorId: pid(a.author), interested: a.interested.map(pid), isDemo: true }));
+// One-line updates. kind: working_on (90 chars max) or ask (120 chars max).
+export const DEMO_UPDATES = [
+  { n: 201, author: 11, kind: 'working_on', hoursAgo: 5, body: 'First paying bike shop goes live Thursday' },
+  { n: 202, author: 1, kind: 'working_on', hoursAgo: 9, body: 'Accessibility checker beta: onboarding the first 10 teams' },
+  { n: 203, author: 3, kind: 'working_on', hoursAgo: 20, body: 'Hiring a first engineer for the sleep app' },
+  { n: 204, author: 2, kind: 'working_on', hoursAgo: 26, body: 'Rewriting the climate data importer in Rust' },
+  { n: 205, author: 8, kind: 'working_on', hoursAgo: 40, body: 'Newsletter #12: pricing pages that actually convert' },
+  { n: 206, author: 5, kind: 'working_on', hoursAgo: 52, body: 'Editing the Fraser River photo book, 40 pages in' },
+  { n: 207, author: 13, kind: 'working_on', hoursAgo: 70, body: 'Final mix of the puzzle game soundtrack' },
+  { n: 211, author: 11, kind: 'ask', hoursAgo: 6, body: 'A designer to look over our onboarding for 30 minutes', helpers: [1, 12] },
+  { n: 212, author: 3, kind: 'ask', hoursAgo: 22, body: 'Intros to anyone who’s hired a first engineer in Vancouver', helpers: [2, 14] },
+  { n: 213, author: 8, kind: 'ask', hoursAgo: 44, body: 'Two founders to talk pricing with, 20 minutes each', helpers: [11] },
+  { n: 214, author: 5, kind: 'ask', hoursAgo: 60, body: 'A printer recommendation for a short photo book run', helpers: [] },
+].map((u) => ({ ...u, id: id(u.n), authorId: pid(u.author), helpers: (u.helpers || []).map(pid), isDemo: true }));
+
+export const DEMO_SPOTS = [
+  { n: 301, by: 2, name: 'Tidewater Café', area: 'West 4th', note: 'Big tables, good wifi, fine with laptops before 2pm.', tags: ['Coffee', 'Laptop-friendly'], regulars: [2, 1, 8, 13] },
+  { n: 302, by: 3, name: 'Larch Street Kitchen', area: 'Kitsilano', note: 'Long tables. Takes groups of eight if you call ahead.', tags: ['Dinner', 'Groups'], regulars: [3, 11, 8] },
+  { n: 303, by: 12, name: 'Kits Beach logs', area: 'Kits Beach', note: 'Sunset hangs by the volleyball courts. Bring a layer.', tags: ['Outdoors', 'Groups'], regulars: [12, 5, 10, 6, 14] },
+  { n: 304, by: 8, name: 'The Arbutus Room', area: 'West Broadway', note: 'Quiet after-dinner drinks, easier to talk on weeknights.', tags: ['Drinks'], regulars: [8, 4] },
+  { n: 305, by: 14, name: 'Kits Pool', area: 'Kits Beach', note: 'Laps in summer, then coffee across the street.', tags: ['Fitness', 'Outdoors'], regulars: [14, 12] },
+].map((s) => ({ ...s, id: id(s.n), addedBy: pid(s.by), regulars: s.regulars.map(pid), isDemo: true }));
+
+export const DEMO_TAKEAWAYS = [
+  { n: 401, author: 11, daysAgo: 2, title: 'Charge from day one', body: 'Our first shop paid $40 a month before the product was finished. Asking early told us more than any survey did.' },
+  { n: 402, author: 12, daysAgo: 9, title: 'Five interviews beat fifty surveys', body: 'Patterns show up by the fifth conversation. After that you’re mostly hearing them again.' },
+  { n: 403, author: 1, daysAgo: 16, title: 'Write the README first', body: 'If you can’t explain it in a paragraph, you’re not ready to build it.' },
+].map((t) => ({ ...t, id: id(t.n), authorId: pid(t.author), isDemo: true }));
 
 /** Next occurrence (local time) of a weekday at HH:MM, today included if still ahead. */
 export function nextOccurrence(weekday, time, from = new Date()) {

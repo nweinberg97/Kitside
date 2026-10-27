@@ -29,26 +29,13 @@ export const CATEGORIES = [
 
 export const categoryTone = (id) => CATEGORIES.find((c) => c.id === id)?.tone || 'slate';
 
-const FITNESS_WORDS = ['running', 'fitness', 'cycling', 'climbing', 'swimming', 'tennis', 'surfing', 'soccer', 'outdoors'];
+/** Character limits that keep the weekly updates one line long. */
+export const LIMITS = { working_on: 90, ask: 120 };
 
-// People filters. Each is a predicate over a profile.
-export const PEOPLE_FILTERS = [
-  { id: 'all', label: 'Everyone', test: () => true },
-  { id: 'Founder', label: 'Founders', test: (p) => p.role === 'Founder' },
-  { id: 'Product', label: 'Product', test: (p) => p.role === 'Product' },
-  { id: 'Design', label: 'Design', test: (p) => p.role === 'Design' },
-  { id: 'Engineering', label: 'Engineering', test: (p) => p.role === 'Engineering' },
-  { id: 'Marketing', label: 'Marketing', test: (p) => p.role === 'Marketing' },
-  { id: 'Creative', label: 'Creative', test: (p) => p.role === 'Creative' },
-  { id: 'remote', label: 'Works remotely', test: (p) => p.isRemote },
-  { id: 'building', label: 'Building something', test: (p) => !!p.workingOn?.trim() },
-  { id: 'collab', label: 'Looking for collaborators', test: (p) => p.lookingFor.includes('Collaborators') },
-  { id: 'social', label: 'Up for hanging out', test: (p) => p.lookingFor.some((l) => ['Meet people', 'Friends', 'Events'].includes(l)) },
-  {
-    id: 'fitness', label: 'Into fitness',
-    test: (p) => p.lookingFor.includes('Fitness buddies') || p.interests.some((i) => FITNESS_WORDS.includes(i.toLowerCase())),
-  },
-];
+/** Invites per person: members 2, hosts 5, the organizer unlimited (null). */
+export const inviteCap = (p) => (p?.isAdmin ? null : p?.isHost ? 5 : 2);
+
+export const SPOT_TAGS = ['Coffee', 'Laptop-friendly', 'Dinner', 'Groups', 'Drinks', 'Outdoors', 'Fitness'];
 
 export const REPORT_REASONS = [
   'Spam or selling',
@@ -59,4 +46,4 @@ export const REPORT_REASONS = [
 ];
 
 export const DISCLAIMER =
-  'Kitside is an independent community concept. Featured businesses, venues, classes, routes, activities, and organizations are examples only and are not affiliated with or endorsed by Kitside.';
+  'Kitside is an independent community. Places members list are their own picks; none are affiliated with or endorsed by Kitside unless stated.';

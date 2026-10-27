@@ -1,14 +1,14 @@
+import { firstName } from '../lib/format.js';
 import { Link } from '../lib/router.jsx';
-import { Avatar, DemoTag } from './ui.jsx';
+import { Avatar, DemoTag, HostBadge } from './ui.jsx';
 
 export default function PersonCard({ person, compact = false }) {
-  const into = person.interests.slice(0, compact ? 3 : 4);
   return (
     <Link to={`/people/${person.id}`} className={`person-card ${compact ? 'is-compact' : ''}`}>
       <div className="person-card-top">
-        <Avatar profile={person} size={compact ? 52 : 60} />
+        <Avatar profile={person} size={compact ? 52 : 56} />
         <div className="person-card-id">
-          <h3>{person.name}</h3>
+          <h3>{person.name} <HostBadge profile={person} /></h3>
           <p className="person-card-role">{person.title || person.role}</p>
           <p className="place"><PinIcon />{person.neighbourhood}</p>
         </div>
@@ -19,12 +19,7 @@ export default function PersonCard({ person, compact = false }) {
           <span className="label-inline">Working on</span> {person.workingOn}
         </p>
       )}
-      {into.length > 0 && <p className="person-card-into">Into {joinNatural(into.map((i) => i.toLowerCase()))}</p>}
-      {!compact && person.lookingFor.length > 0 && (
-        <ul className="open-to" aria-label="Open to">
-          {person.lookingFor.slice(0, 3).map((l) => <li key={l}>{l}</li>)}
-        </ul>
-      )}
+      {!compact && person.inviter && <p className="person-card-into">Invited by {firstName(person.inviter.name)}</p>}
     </Link>
   );
 }

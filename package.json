@@ -2,7 +2,7 @@
   "name": "kitside",
   "private": true,
   "version": "0.1.0",
-  "description": "Good people, right nearby. A local community for people in Kitsilano.",
+  "description": "A small, invite-only community for people building things in Kitsilano.",
   "type": "module",
   "scripts": {
     "dev": "vite",

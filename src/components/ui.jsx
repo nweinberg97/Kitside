@@ -3,7 +3,7 @@ import { firstName } from '../lib/format.js';
 import { Link } from '../lib/router.jsx';
 
 export function Avatar({ profile, size = 48 }) {
-  const name = profile?.name || 'A neighbour';
+  const name = profile?.name || 'A member';
   const style = { width: size, height: size, fontSize: size * 0.42, '--hue': profile?.avatarHue ?? 160 };
   if (profile?.avatarUrl) {
     return <img className="avatar" src={profile.avatarUrl} alt="" style={style} referrerPolicy="no-referrer" />;
@@ -12,7 +12,7 @@ export function Avatar({ profile, size = 48 }) {
 }
 
 export function DemoTag() {
-  return <span className="demo-tag" title="A fictional example member, activity or post">Example</span>;
+  return <span className="demo-tag" title="A fictional example, to show how Kitside works">Example</span>;
 }
 
 export function Tags({ items, tone }) {
@@ -130,6 +130,15 @@ export function Field({ label, hint, error, children, htmlFor }) {
 }
 
 export function PersonLink({ profile, className = 'person-link' }) {
-  if (!profile) return <span className={className}>A neighbour</span>;
+  if (!profile) return <span className={className}>A member</span>;
   return <Link className={className} to={`/people/${profile.id}`}>{profile.name}</Link>;
+}
+
+export function HostBadge({ profile }) {
+  if (!profile?.isHost && !profile?.isAdmin) return null;
+  return (
+    <span className="host-badge" title={profile.isAdmin ? 'Organizer: runs Kitside and can create events' : 'Host: can create events'}>
+      {profile.isAdmin ? 'Organizer' : 'Host'}
+    </span>
+  );
 }

@@ -1,166 +1,145 @@
 # Kitside
 
-**Good people, right nearby.**
+**A small community for people building things in Kits.**
 
-Kitside is a local community for people in Kitsilano who build, work, create, explore, and want to meet more interesting people nearby. See who's around, find something to do this week, post what you're up to, and say "I'm in."
+Kitside is an invite-only community for founders, builders and creatives who live in and around Kitsilano, Vancouver. It's built around one weekly session: work side by side, then stay for dinner if enough people want to. The app is the quiet layer around that table: who's coming, what people are working on, who could use a hand, and one short note on Sunday.
 
-> Kitside is an independent prototype/community concept. Any businesses, venues, classes, routes, activities, or organizations referenced in the demo are examples only and are not affiliated with, sponsored by, or endorsed by Kitside unless explicitly stated.
+> Kitside is an independent community. Places members list are their own picks and aren't affiliated with or endorsed by Kitside unless stated.
 
 ---
 
-## Why it exists
+## Principles
 
-**The problem.** Plenty of interesting people live within a few blocks of each other in Kits: founders, engineers, designers, remote workers, creatives, people new to town. There's no lightweight way to find them by what they do, what they're building, or what they'd like to do this weekend. Slack groups are noisy, Meetup is transactional, LinkedIn isn't local, coworking is tied to a building, and Instagram doesn't help you discover the person two streets over.
-
-**The thesis.** There are already interesting people and interesting things happening around Kits. Kitside makes them easier to find. Locality is the wedge: everything is neighbourhood-scale, and nothing ever shows more precise location than a neighbourhood.
-
-**Who it's for.** People living in or around Kitsilano: founders and operators, engineers, product and design people, marketers, researchers, freelancers, remote workers, independent builders, creatives, active people, and anyone who wants a stronger local social life. You don't need to work in tech.
-
-**The loop.** Discover people → discover things to do → say you're in → meet people → post your own plans → the community grows.
+- **The table comes first, the app second.** Every feature should end in people meeting in person.
+- **Quiet by design.** No feed, no likes, no followers, no DMs, no streaks. The Sunday note is the only notification.
+- **Invite-only.** Everyone was brought in by someone already in, and profiles show who.
+- **Updates, not stories.** One line each, with hard character limits.
+- **Neighbourhood, never address.**
 
 ## What's in the app
 
-| Area | What you can do |
+| Area | What it does |
 | --- | --- |
-| **Home** | The pitch in ten seconds, an illustrated Kits Beach scene with live pins for neighbours and plans, people and things happening this week |
-| **People** | Browse profiles, filter (founders, design, remote, building something, looking for collaborators, into fitness…), open a profile |
-| **Things to do** | Upcoming activities grouped by day, filter by Build / Move / Work / Eat / Explore / Social, say "I'm in", start your own |
-| **Announcements** | A neighbourhood bulletin board. Post "what do you want to do?" with an optional date, time, place and category; others tap "I'm interested" |
-| **Join + onboarding** | Email sign-up (social sign-in where configured), then four quick questions: what you do, what you're into, what you're looking for, what you're working on |
-| **My profile** | Edit everything neighbours see, live preview, manage blocked people, log out |
-| **Trust & safety** | Report people, posts and activities; block people; delete your own posts; neighbourhood-level location only; no fake verification badges |
+| **This week** (members' home) | The weekly session with "I'm in" and a separate **Staying for dinner** toggle. Dinner is on once the host's minimum say yes (3 by default), and the card shows how many more are needed. Below: what people are working on, who needs help, other events this week, the latest takeaway and newest spot. |
+| **Updates** | Two kinds of one-liners: **Working on** (90 characters; a new one replaces your last) and **Needs help** (120 characters). Others tap **I can help**; you mark an ask **Sorted**. Updates drop off after a week. Your history stays on your profile. |
+| **People** | Everyone in Kitside, with **Host** / **Organizer** badges and **Invited by**. No filters, since the group is small. |
+| **Profiles** | What someone's working on (a running log), open asks, events they're hosting, and **Get in touch**: email by default, plus LinkedIn and Instagram if they add them. There are no in-app messages. |
+| **Our Spots** | Places members actually go: name, area, one line on why it's good, tags (Coffee, Laptop-friendly, Dinner, Groups…), and **I go here**. Later, the list becomes the pitch for table deals with those venues. |
+| **Takeaways** | A useful insight, saved when one comes up. Never a required write-up. |
+| **Hosts** | Only hosts create events. The organizer makes people hosts from the "…" menu on their profile. |
+| **Invites** | From **My profile**: members get 2 invite links, hosts 5, the organizer unlimited. Each link carries a one-time code. |
+| **Sunday note** | `#/note` shows exactly what goes out: this week's events, each person's latest working-on line, open asks, new spots and takeaways. One line each, empty sections left out. The organizer can **Copy as email**, or send it automatically (below). |
+| **Landing page** | For visitors: real photos and video from Kits, how the week works, an example Sunday note, and **I have an invite**. |
+| **Demo** | **See how it works** opens a sandbox with a made-up community in the visitor's browser (invite code `KITS-DEMO`). The real database is never touched. |
 
 ## Architecture
 
-Deliberately small:
-
-- **Frontend:** React 19 + Vite, plain JSX and CSS. No UI framework, no state library. A ~50-line hash router (`src/lib/router.jsx`) so the build works on any static host.
-- **Backend:** [Supabase](https://supabase.com) free tier: Postgres, Auth and row-level security. No custom server.
+- **Frontend:** React 19 + Vite, plain JSX and CSS, and a ~50-line hash router (`src/lib/router.jsx`) so it runs on any static host.
+- **Backend:** [Supabase](https://supabase.com) (Postgres, Auth, row-level security). No custom server.
 - **Hosting:** GitHub Pages via GitHub Actions (`.github/workflows/deploy.yml`).
-- **Demo mode:** the "See the demo" button switches a visitor into a sandbox full of sample neighbours, stored only in their browser. A yellow banner (and a "Leave demo" pill on phones) takes them back to the real community. The real database is never touched, so the live site can show only real members while anyone can still see what a busy Kitside looks like.
-- **Preview mode:** with no Supabase settings, the same app runs entirely in the browser on `localStorage` (`src/lib/backend/local.js`). Handy for local development and design reviews. Nothing is shared between people in this mode, and a banner says so.
+- **Modes:** live (Supabase), demo (sandbox in the browser), and preview (no Supabase configured, for local development; open `#/?view=landing` to see the landing page).
 
 ```
 src/
-  main.jsx, App.jsx          entry + page switch
-  styles.css                 the whole visual system (tokens at the top)
   lib/
-    api.js                   the one data API the UI uses; picks a backend
-    backend/supabase.js      live backend (Supabase)
-    backend/local.js         preview backend (localStorage)
-    seed.js                  the fictional demo community (single source of truth)
-    constants.js             roles, interests, categories, filters, disclaimer
-    config.js, format.js, router.jsx, useLoad.js
-  state/                     session (auth + profile + blocks), toasts, member gate
-  components/                KitsScene (hero illustration), cards, buttons, modal, layout
-  pages/                     Home, People, Person, Things, Announcements, Join, Welcome, MyProfile
+    api.js               the one data API the UI uses; picks a backend
+    backend/supabase.js  live backend
+    backend/local.js     demo / preview backend (localStorage), mirrors the database rules
+    week.js              "this week", latest-per-person, the Sunday note builder
+    seed.js              the fictional demo community
+  components/weekly.jsx  session card, one-line composer, lists, host dialog, contact row
+  pages/                 Landing, Week, Updates, People, Person, Spots, Takeaways, Note, Join, Welcome, MyProfile
+public/img/              landing photos and the waves clip (location data stripped)
 supabase/
-  migrations/20261006000000_kitside_init.sql   tables, RLS policies, grants (non-destructive)
-  seed.sql                                     demo community (generated, insert-only)
-scripts/generate-seed-sql.mjs                  regenerates seed.sql from src/lib/seed.js
+  migrations/20261006000000_kitside_init.sql     tables, RLS, grants
+  migrations/20261027000000_kitside_weekly.sql   invites, hosts, updates, spots, takeaways, dinner RSVPs
+  functions/weekly-note/index.ts                 sends the Sunday note
+  seed.sql                                       optional demo rows (generated)
 ```
 
 ### Data model
 
 | Table | Purpose |
 | --- | --- |
-| `profiles` | One per member (`id` = auth user id). Name, role, title, bio, neighbourhood, interests, looking for, working on, remote, optional LinkedIn link. `is_demo` marks fictional examples. |
-| `activities` | Things to do: host, title, category, approximate location, start time. |
-| `announcements` | Bulletin posts: author, title, optional details/date/time/place/category. `hidden` lets a moderator take a post down. |
-| `activity_interests`, `announcement_interests` | Who said "I'm in". Counts are public. |
-| `blocks` | Private to the blocker. |
-| `reports` | Write-only from the app. Review in the Supabase Table Editor. |
+| `profiles` | One per member. Adds `is_host`, `is_admin` (organizer), `invited_by`, `contact_email`, `instagram`, `weekly_note`. |
+| `invites` | One-time codes. Created and redeemed only through database functions. |
+| `activities` | Events. `is_session` marks the weekly session; `dinner_place`, `dinner_time` and `dinner_min` set up the optional dinner. |
+| `activity_interests` | Who's in, plus `dinner` for who's staying. |
+| `updates`, `update_helpers` | Working-on and needs-help lines, and who can help. |
+| `spots`, `spot_regulars` | Our Spots, and who goes there. |
+| `takeaways` | Saved insights. |
+| `blocks`, `reports` | Trust and safety, unchanged. |
 
 ### Security (row-level security)
 
-- People who haven't joined see only the fictional example profiles. Real members' profiles are visible to signed-in members only. Activities and posts by real members show "A neighbour" to visitors.
-- You can only create or edit your own profile, and can't mark anything as demo.
-- Only hosts can edit or cancel their activities; only authors can delete their posts.
-- You can only add or remove your own "I'm in".
-- Blocks are visible only to the person who blocked. Reports can't be read through the app at all.
-- The browser only ever holds the Supabase URL and **publishable** key. Never put a secret / `service_role` key in this repo.
+- Only members (people with a profile) can see profiles, events, updates, spots and takeaways. Visitors see the landing page.
+- Creating a profile needs a redeemed invite. The exception is the very first person, who becomes the **organizer** (admin and host).
+- Members can't make themselves hosts or organizers, or change who invited them. A database trigger resets those fields, and only the organizer can change hosts.
+- Only hosts can create events. You can only change or delete your own things, and the organizer can also remove spots and takeaways.
+- Edits made in the Supabase SQL Editor are not blocked, so you can always fix things by hand.
+- The browser only holds the Supabase URL and the **publishable** key.
 
-These rules were tested against Postgres 16 with a stand-in for Supabase's `auth` schema: own-row writes succeed; writing as someone else, faking demo rows, reading reports, and anonymous writes are all refused.
+These rules were tested against Postgres 16, including running the migrations twice, invite limits, host-only events and members-only reading.
 
 ## Launch it
 
-The live site reads its Supabase settings from `.env.production` (already filled in with this project's URL and publishable key; both are public by design).
+### 1. Database (once)
 
-### 1. Set up the database (once)
+In Supabase → **SQL Editor → New query**, run these in order:
 
-In the Supabase dashboard for the project, open **SQL Editor → New query** and run, in order:
+1. `supabase/migrations/20261006000000_kitside_init.sql`
+2. `supabase/migrations/20261027000000_kitside_weekly.sql`
 
-1. `supabase/migrations/20261006000000_kitside_init.sql`: creates the tables, policies and grants.
-2. *(Optional)* `supabase/seed.sql`: adds the fictional example community to the database itself. You don't need it for the demo button, which uses sample data in the visitor's browser. The live site hides these rows while `VITE_SHOW_DEMO=false`.
+Both are non-destructive: they never drop or delete anything, they run as one transaction, and they're safe to re-run. The second one tightens four existing access rules in place, for members-only reading, invite-required joining and hosts-only events.
 
-Both scripts are **non-destructive**: they never drop, delete or overwrite anything, run as a single transaction, and are safe to re-run. If a table with one of Kitside's names already exists with a different shape, the migration stops before changing anything and tells you which table and columns are the problem.
+`supabase/seed.sql` is optional. You don't need it, and the live site hides those rows anyway.
 
-With the Supabase CLI instead: `supabase link --project-ref akojekqdkcncsrckbtdh` then `supabase db push` (you'll enter the database password in your own terminal).
+### 2. Become the organizer
 
-### 2. Configure auth
+Open the live site, press **I have an invite**, and sign up. Before anyone has joined, no code is needed. The first profile becomes the organizer. Then go to **My profile → Invites** and make links for your first people.
 
-In **Authentication → URL Configuration**:
+### 3. Auth settings
 
-- **Site URL:** `https://nweinberg97.github.io/Kitside/`
-- **Redirect URLs:** add `https://nweinberg97.github.io/Kitside/` and `http://localhost:5173/`
+In **Authentication → URL Configuration**, set the Site URL to `https://nweinberg97.github.io/Kitside/` and add it, plus `http://localhost:5173/`, to Redirect URLs. Supabase's built-in email is rate-limited, so for a launch either turn off **Confirm email** or add your own SMTP (Resend, Postmark).
 
-In **Authentication → Providers → Email**: Supabase's built-in email sender is limited to a few emails an hour, which is fine for testing but not for a launch. Either turn off **Confirm email** for the first wave of neighbours, or add your own SMTP (Resend, Postmark, etc. all have free tiers) under **Authentication → Emails → SMTP settings**.
+### 4. GitHub Pages
 
-### 3. Turn on GitHub Pages
+Repo **Settings → Pages → Source: GitHub Actions**. Every push to `main` deploys.
 
-Repo **Settings → Pages → Source: GitHub Actions**. Every push to `main` builds and deploys to `https://nweinberg97.github.io/Kitside/`.
+### 5. (Optional) Send the Sunday note automatically
 
-### 4. (Optional) Social sign-in
+Until you set this up, open `#/note`, press **Copy as email**, and send it yourself.
 
-The Google, Apple and LinkedIn buttons are real Supabase OAuth calls, but each one shows "Not set up yet" until you switch it on:
-
-1. Enable the provider in **Authentication → Providers** (Google; Apple; **LinkedIn (OIDC)**), using credentials from that provider's developer console. The callback URL to give them is `https://akojekqdkcncsrckbtdh.supabase.co/auth/v1/callback`.
-2. Add it to `VITE_AUTH_PROVIDERS` in `.env.production`, e.g. `VITE_AUTH_PROVIDERS=google,linkedin_oidc`, and push.
-
-LinkedIn sign-in proves someone controls a LinkedIn account; Kitside doesn't show it as a "verified" badge.
-
-### 5. Real community vs. demo
-
-The live site shows only real members (`VITE_SHOW_DEMO=false` in `.env.production`). Anyone who wants to see Kitside full of people presses **See the demo** on the home page, in empty states, or in the footer.
+1. Make a free [Resend](https://resend.com) account and verify a sending domain.
+2. In Supabase → **Edge Functions → Secrets**, add these yourself. Never paste them in chat or commit them:
+   - `RESEND_API_KEY`
+   - `NOTE_FROM`, e.g. `Kitside <note@yourdomain.com>`
+   - `NOTE_SECRET`, any long random string
+   - `SITE_URL`, set to `https://nweinberg97.github.io/Kitside/`
+3. Deploy the function: `supabase functions deploy weekly-note --project-ref akojekqdkcncsrckbtdh`.
+4. Try it without sending anything: call it with header `x-kitside-secret: <NOTE_SECRET>` and body `{"dryRun": true}`.
+5. Schedule it with Supabase **Integrations → Cron**: Sundays at 9:00 Vancouver time (`0 16 * * 0` in UTC; use `0 17 * * 0` in winter). Use an HTTP request to the function URL with the `x-kitside-secret` header.
 
 ## Run it locally
 
 ```bash
 npm install
-npm run dev          # http://localhost:5173
+npm run dev          # http://localhost:5173  (preview mode; #/?view=landing for the landing page)
 ```
 
-Without a `.env.local`, local dev uses preview mode (browser-only data, seeded with the demo community). To develop against Supabase, copy `.env.example` to `.env.local` and fill it in. `npm run build` produces `dist/`.
-
-### Environment variables
+Copy `.env.example` to `.env.local` to develop against Supabase. `npm run seed:sql` regenerates `supabase/seed.sql` after you edit `src/lib/seed.js`.
 
 | Variable | Meaning |
 | --- | --- |
-| `VITE_SUPABASE_URL` | Supabase project URL. Empty = preview mode |
-| `VITE_SUPABASE_ANON_KEY` | Supabase publishable (anon) key. Public by design |
-| `VITE_AUTH_PROVIDERS` | Comma list of OAuth providers you've enabled: `google`, `apple`, `linkedin_oidc` |
-| `VITE_SHOW_DEMO` | Live site only: `true` also shows example rows stored in the database by `seed.sql`. The demo button works either way |
+| `VITE_SUPABASE_URL` | Supabase project URL. Empty means preview mode |
+| `VITE_SUPABASE_ANON_KEY` | Supabase publishable key. Public by design |
+| `VITE_AUTH_PROVIDERS` | OAuth providers you've switched on: `google`, `apple`, `linkedin_oidc` |
+| `VITE_SHOW_DEMO` | `true` also shows demo rows stored in the database. The demo button works either way |
 
-## Demo data
+## Later
 
-Every example person, activity and post is **fictional** and lives in `src/lib/seed.js`. The "See the demo" sandbox loads it fresh each time someone enters. In the UI they carry an "Example" tag. There are 14 people (a mix of founders, engineers, designers, PMs, creatives, a physio who's just curious), 9 weekly activities and 10 bulletin posts. Example activities repeat weekly (`roll_demo_activities()`), so the schedule never looks stale. Real places mentioned (Point Grey Road, Kits Beach, West 4th, Pacific Spirit) are public places used as examples only.
-
-After editing `seed.js`, run `npm run seed:sql` to regenerate `supabase/seed.sql`.
-
-## Known limitations
-
-- No messaging. You meet people by joining the same plan or replying in person. Deliberate for now.
-- No image uploads. Avatars are initials, or the photo from a social sign-in.
-- Moderation is manual: reports land in the `reports` table, and you hide a post by setting `hidden = true`.
-- Activities can't be edited after posting (cancel and repost).
-- Free-tier Supabase pauses projects after a week without traffic; open the dashboard to wake it.
-- Email confirmation depends on Supabase's email limits until you add SMTP (see above).
-
-## Future opportunities
-
-- "New this week" digest email for people who opt in
-- Lightweight replies on announcements
-- Small recurring groups (Saturday runners, Wednesday builders)
-- A neighbourhood map view of plans (still approximate, never addresses)
-- LinkedIn sign-in as an opt-in trust signal
-- Expanding the wedge: West Point Grey, Fairview, Mount Pleasant, one neighbourhood at a time
+- Double-opt-in intros ("I'd like to meet Paige")
+- Hosts nominating hosts, with the organizer approving
+- Table deals with the most-used spots
+- Session notes from deep dives, as Takeaways grow
+- One neighbouring area at a time, only once the core group keeps showing up

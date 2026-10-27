@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PersonCard from '../components/PersonCard.jsx';
 import { ChipGroup, Field } from '../components/ui.jsx';
 import { api } from '../lib/api.js';
@@ -6,8 +6,9 @@ import { INTERESTS, LOOKING_FOR, NEIGHBOURHOODS, ROLES } from '../lib/constants.
 import { firstName } from '../lib/format.js';
 import { Link, Redirect } from '../lib/router.jsx';
 import { useSession } from '../state/session.jsx';
+import { pendingInvite } from './Join.jsx';
 
-const STEPS = ['What do you do?', 'What are you into?', 'What are you looking for?', 'What are you building or working on?'];
+const STEPS = ['What do you do?', 'What are you into?', 'What are you looking for?', 'What are you working on this week?'];
 
 export default function Welcome() {
   const { user, profile, loading, setProfile } = useSession();
@@ -18,7 +19,13 @@ export default function Welcome() {
   const [form, setForm] = useState(() => ({
     name: user?.name || '', role: '', title: '', isRemote: false,
     interests: [], lookingFor: [], workingOn: '', neighbourhood: 'Kitsilano', bio: '',
+    contactEmail: user?.email || '', invite: pendingInvite.get(),
   }));
+  const [needsCode, setNeedsCode] = useState(false);
+  useEffect(() => {
+    if (!user || profile) return;
+    api.communityStarted().then((started) => setNeedsCode(started && !pendingInvite.get())).catch(() => {});
+  }, [user, profile]);
 
   if (loading) return null;
   if (!user) return <Redirect to="/join" />;
@@ -36,13 +43,22 @@ export default function Welcome() {
 
   async function finish(e) {
     e.preventDefault();
-    if (!name.trim()) return setError('Add your name so neighbours know who you are.');
+    if (!name.trim()) return setError('Add your name so people know who you are.');
     setBusy(true);
     try {
+      const code = (form.invite || '').trim().toUpperCase();
+      if (await api.communityStarted()) {
+        if (!code) { setNeedsCode(true); throw new Error('Add the invite code a member sent you.'); }
+        try { await api.redeemInvite(code); } catch (err) { setNeedsCode(true); throw err; }
+      }
+      const { invite, ...fields } = form;
       const saved = await api.saveProfile({
-        ...form, name: name.trim(), title: form.title.trim(), workingOn: form.workingOn.trim(), bio: form.bio.trim(),
+        ...fields, name: name.trim(), title: form.title.trim(), workingOn: form.workingOn.trim(), bio: form.bio.trim(),
+        contactEmail: form.contactEmail.trim(), instagram: '', weeklyNote: true,
         avatarUrl: user.avatarUrl || '', avatarHue: Math.floor(Math.random() * 360), linkedinUrl: '',
       });
+      pendingInvite.set('');
+      if (form.workingOn.trim()) await api.createUpdate({ kind: 'working_on', body: form.workingOn.trim() }).catch(() => {});
       setDone(saved);
       setProfile(saved);
     } catch (err) {
@@ -56,12 +72,12 @@ export default function Welcome() {
       <div className="page page-auth">
         <div className="welcome-done">
           <div className="welcome-pin" aria-hidden="true"><span /></div>
-          <h1>You’re on the map, {firstName(done.name)}.</h1>
-          <p>Here’s how neighbours will see you. You can change any of it from your profile.</p>
+          <h1>You’re in, {firstName(done.name)}.</h1>
+          <p>{done.isAdmin ? 'You’re the organizer. Plan this week’s session, then make a few invite links from your profile.' : 'Here’s how other members will see you. You can change any of it from your profile.'}</p>
           <div className="welcome-card"><PersonCard person={done} /></div>
           <div className="hero-actions">
-            <Link to="/people" className="btn btn-primary btn-lg">See who’s around</Link>
-            <Link to="/things" className="btn btn-ghost btn-lg">Find something to do</Link>
+            <Link to="/" className="btn btn-primary btn-lg">See this week</Link>
+            <Link to="/me" className="btn btn-ghost btn-lg">{done.isAdmin ? 'Make invites' : 'Edit my profile'}</Link>
           </div>
         </div>
       </div>
@@ -93,8 +109,8 @@ export default function Welcome() {
         {step === 2 && <ChipGroup multiple label="Looking for" options={LOOKING_FOR} value={form.lookingFor} onChange={(lookingFor) => patch({ lookingFor })} />}
         {step === 3 && (
           <div className="stack">
-            <Field label="Working on" htmlFor="w-work" hint="Optional. A startup, a side project, a book, a garden. Or nothing.">
-              <input id="w-work" maxLength={140} placeholder="A better way to find pickup soccer" value={form.workingOn} onChange={(e) => patch({ workingOn: e.target.value })} />
+            <Field label="Working on" htmlFor="w-work" hint={`Optional. One line, ${90 - form.workingOn.length} characters left. It goes in Sunday’s note.`}>
+              <input id="w-work" maxLength={90} placeholder="Launching the beta to the first ten users" value={form.workingOn} onChange={(e) => patch({ workingOn: e.target.value })} />
             </Field>
             <div className="field-row">
               <Field label="Your name" htmlFor="w-name">
@@ -106,6 +122,14 @@ export default function Welcome() {
                 </select>
               </Field>
             </div>
+            <Field label="Email members can reach you at" htmlFor="w-email" hint="Kitside has no messages, so this is how people follow up. Only members see it. Clear it to hide it.">
+              <input id="w-email" type="email" value={form.contactEmail} onChange={(e) => patch({ contactEmail: e.target.value })} />
+            </Field>
+            {needsCode && (
+              <Field label="Invite code" htmlFor="w-invite" hint="Kitside is invite-only. It looks like KITS-AB2CD.">
+                <input id="w-invite" className="code-input" autoComplete="off" value={form.invite} onChange={(e) => patch({ invite: e.target.value })} />
+              </Field>
+            )}
           </div>
         )}
 

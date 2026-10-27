@@ -1,16 +1,30 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { DemoButton } from '../components/Layout.jsx';
 import { Field } from '../components/ui.jsx';
 import { api } from '../lib/api.js';
-import { ENABLED_PROVIDERS, OAUTH_PROVIDERS } from '../lib/config.js';
+import { ENABLED_PROVIDERS, MODE, OAUTH_PROVIDERS } from '../lib/config.js';
 import { Link, navigate } from '../lib/router.jsx';
+import { DEMO_INVITE } from '../lib/seed.js';
 import { useSession } from '../state/session.jsx';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const INVITE_KEY = 'kitside:invite';
 
-export default function Join({ mode = 'join', next = '/' }) {
+/** The invite code from the link (or typed in), kept until the profile is made. */
+export const pendingInvite = {
+  get() { try { return localStorage.getItem(INVITE_KEY) || ''; } catch { return ''; } },
+  set(code) { try { code ? localStorage.setItem(INVITE_KEY, code) : localStorage.removeItem(INVITE_KEY); } catch { /* storage blocked */ } },
+};
+
+export default function Join({ mode = 'join', next = '/', invite = '' }) {
   const isJoin = mode === 'join';
   const { user, profile } = useSession();
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [started, setStarted] = useState(true);
+  const [form, setForm] = useState(() => ({
+    name: '', email: '', password: '', invite: invite || pendingInvite.get() || (MODE === 'demo' ? DEMO_INVITE : ''),
+  }));
+  useEffect(() => { if (isJoin) api.communityStarted().then(setStarted).catch(() => {}); }, [isJoin]);
+  useEffect(() => { if (invite) pendingInvite.set(invite.trim().toUpperCase()); }, [invite]);
   const [errors, setErrors] = useState({});
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
@@ -31,7 +45,8 @@ export default function Join({ mode = 'join', next = '/' }) {
   async function submit(e) {
     e.preventDefault();
     const errs = {};
-    if (isJoin && !form.name.trim()) errs.name = 'What should neighbours call you?';
+    if (isJoin && started && !form.invite.trim()) errs.invite = 'Kitside is invite-only. Paste the code a member sent you.';
+    if (isJoin && !form.name.trim()) errs.name = 'What should people call you?';
     if (!EMAIL_RE.test(form.email.trim())) errs.email = 'Enter an email like name@example.com.';
     if (form.password.length < (isJoin ? 8 : 1)) errs.password = isJoin ? 'Use at least 8 characters.' : 'Enter your password.';
     setErrors(errs);
@@ -39,6 +54,15 @@ export default function Join({ mode = 'join', next = '/' }) {
     setBusy(true);
     try {
       if (isJoin) {
+        if (started) {
+          const code = form.invite.trim().toUpperCase();
+          if (!(await api.inviteValid(code))) {
+            setErrors({ invite: 'That invite code isn’t valid, or it’s already been used.' });
+            setBusy(false);
+            return;
+          }
+          pendingInvite.set(code);
+        }
         const { needsConfirmation } = await api.signUp(form);
         if (needsConfirmation) { setSent(true); setBusy(false); return; }
         navigate('/welcome');
@@ -55,6 +79,11 @@ export default function Join({ mode = 'join', next = '/' }) {
 
   async function oauth(provider) {
     setErrors({});
+    if (isJoin && started) {
+      const code = form.invite.trim().toUpperCase();
+      if (!code || !(await api.inviteValid(code))) { setErrors({ invite: 'Add a valid invite code first.' }); return; }
+      pendingInvite.set(code);
+    }
     try { await api.signInWithProvider(provider); } catch (err) { setErrors({ form: err.message }); }
   }
 
@@ -73,10 +102,18 @@ export default function Join({ mode = 'join', next = '/' }) {
   return (
     <div className="page page-auth">
       <div className="auth-card">
-        <h1>{isJoin ? 'Join Kitside' : 'Welcome back'}</h1>
+        <h1>{isJoin ? (started ? 'You’re invited' : 'Start Kitside') : 'Welcome back'}</h1>
         <p className="muted">
-          {isJoin ? 'Free, local, and about a minute to set up.' : 'Log in to see who’s around.'}
+          {isJoin
+            ? started ? 'Kitside is invite-only. Use the code a member sent you.' : 'Nobody has joined yet. You’ll be the organizer, and you can invite people after.'
+            : 'Log in to see what’s on this week.'}
         </p>
+
+        {isJoin && started && (
+          <Field label="Invite code" htmlFor="j-invite" error={errors.invite} hint={MODE === 'demo' ? `In the demo, ${DEMO_INVITE} works.` : 'It looks like KITS-AB2CD.'}>
+            <input id="j-invite" autoComplete="off" autoCapitalize="characters" spellCheck={false} value={form.invite} onChange={set('invite')} className="code-input" />
+          </Field>
+        )}
 
         <div className="oauth">
           {OAUTH_PROVIDERS.map((p) => {
@@ -116,9 +153,12 @@ export default function Join({ mode = 'join', next = '/' }) {
         </form>
 
         <p className="auth-switch">
-          {isJoin ? <>Already a member? <Link to={`/login?next=${encodeURIComponent(next)}`}>Log in</Link></> : <>New here? <Link to={`/join?next=${encodeURIComponent(next)}`}>Join Kitside</Link></>}
+          {isJoin ? <>Already a member? <Link to={`/login?next=${encodeURIComponent(next)}`}>Log in</Link></> : <>Got an invite? <Link to={`/join?next=${encodeURIComponent(next)}`}>Join Kitside</Link></>}
         </p>
-        <p className="fine-print">Kitside only ever shows your neighbourhood, never your address. You choose everything on your profile.</p>
+        {isJoin && started && MODE === 'live' && (
+          <p className="auth-switch">No invite yet? <DemoButton className="text-btn">Look around the demo</DemoButton></p>
+        )}
+        <p className="fine-print">Only members see your profile. Kitside shows your neighbourhood, never your address.</p>
       </div>
     </div>
   );

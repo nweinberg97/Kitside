@@ -5,10 +5,18 @@ import { useSession } from '../state/session.jsx';
 import { Avatar } from './ui.jsx';
 
 const NAV = [
-  { to: '/people', route: ['people', 'person'], label: 'People' },
-  { to: '/things', route: ['things'], label: 'Things to do' },
-  { to: '/announcements', route: ['announcements'], label: 'Announcements' },
+  { to: '/', route: ['home'], label: 'This week', short: 'Week', icon: 'week' },
+  { to: '/updates', route: ['updates'], label: 'Updates', short: 'Updates', icon: 'updates' },
+  { to: '/people', route: ['people', 'person'], label: 'People', short: 'People', icon: 'people' },
+  { to: '/spots', route: ['spots'], label: 'Our Spots', short: 'Spots', icon: 'spots' },
+  { to: '/takeaways', route: ['takeaways'], label: 'Takeaways', short: 'Takeaways', icon: 'takeaways' },
 ];
+
+/** Members (and anyone in the demo or local preview) get the app navigation. */
+function useShowNav() {
+  const { isMember } = useSession();
+  return isMember || MODE !== 'live';
+}
 
 export function Logo() {
   return (
@@ -30,15 +38,18 @@ export function Logo() {
 
 export function TopNav({ route, overlay }) {
   const { user, profile, loading } = useSession();
+  const showNav = useShowNav() && !overlay;
   return (
     <header className={`topnav ${overlay ? 'is-overlay' : ''}`}>
       <div className="topnav-inner">
         <Logo />
-        <nav className="topnav-links" aria-label="Main">
-          {NAV.map((n) => (
-            <Link key={n.to} to={n.to} aria-current={n.route.includes(route.name) ? 'page' : undefined}>{n.label}</Link>
-          ))}
-        </nav>
+        {showNav && (
+          <nav className="topnav-links" aria-label="Main">
+            {NAV.map((n) => (
+              <Link key={n.to} to={n.to} aria-current={n.route.includes(route.name) ? 'page' : undefined}>{n.label}</Link>
+            ))}
+          </nav>
+        )}
         <div className="topnav-end">
           {MODE === 'demo' && (
             <button type="button" className="demo-pill" onClick={() => exitDemo('/')} aria-label="Leave the demo and go back to the real Kitside">
@@ -55,7 +66,7 @@ export function TopNav({ route, overlay }) {
           ) : (
             <>
               <Link to="/login" className="topnav-login">Log in</Link>
-              <Link to="/join" className="btn btn-primary btn-sm">Join Kitside</Link>
+              <Link to="/join" className={`btn btn-sm ${overlay ? 'btn-sun' : 'btn-primary'}`}>I have an invite</Link>
             </>
           )}
         </div>
@@ -65,24 +76,26 @@ export function TopNav({ route, overlay }) {
 }
 
 const ICONS = {
-  home: <path d="M3 10.5L11 4l8 6.5V19a1 1 0 01-1 1h-4.5v-5.5h-5V20H4a1 1 0 01-1-1z" />,
+  week: <><rect x="3.5" y="5" width="15" height="14" rx="2.5" /><path d="M3.5 9.5h15M8 3v4M14 3v4" /><circle cx="11" cy="14" r="1.6" /></>,
+  updates: <><path d="M4 6.5h14M4 11h14M4 15.5h9" /></>,
   people: <><circle cx="8" cy="8" r="3.2" /><circle cx="15.5" cy="9" r="2.6" /><path d="M2.5 19c.6-3.4 2.8-5.2 5.5-5.2s4.9 1.8 5.5 5.2M13.6 14.2c.6-.2 1.2-.3 1.9-.3 2.3 0 4 1.5 4.5 5.1" /></>,
-  things: <><rect x="3.5" y="5" width="15" height="14" rx="2.5" /><path d="M3.5 9.5h15M8 3v4M14 3v4" /></>,
-  announcements: <><path d="M4 9.5v3.5a1 1 0 001 1h2l5 4V4.5l-5 4H5a1 1 0 00-1 1z" /><path d="M15.5 8.5a3.5 3.5 0 010 5" /></>,
+  spots: <><path d="M11 19.5s6-5.6 6-10a6 6 0 00-12 0c0 4.4 6 10 6 10z" /><circle cx="11" cy="9.5" r="2.2" /></>,
+  takeaways: <><path d="M6 3.5h10a1 1 0 011 1v15l-6-3.5-6 3.5v-15a1 1 0 011-1z" /></>,
 };
 
 export function BottomNav({ route }) {
-  const items = [{ to: '/', route: ['home'], label: 'Home', icon: 'home' }, ...NAV.map((n) => ({ ...n, icon: n.to.slice(1) }))];
+  const showNav = useShowNav();
+  if (!showNav) return null;
   return (
     <nav className="bottomnav" aria-label="Main">
-      {items.map((n) => {
+      {NAV.map((n) => {
         const on = n.route.includes(route.name);
         return (
           <Link key={n.to} to={n.to} aria-current={on ? 'page' : undefined}>
             <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               {ICONS[n.icon]}
             </svg>
-            <span>{n.label}</span>
+            <span>{n.short}</span>
           </Link>
         );
       })}
@@ -105,7 +118,7 @@ export function PreviewBanner() {
     return (
       <div className="preview-banner demo-banner">
         <p>
-          <strong>You’re in the demo.</strong> These neighbours are made up, and anything you do here stays in this browser.
+          <strong>You’re in the demo.</strong> These members are made up, and anything you do here stays in this browser.
         </p>
         <button type="button" className="demo-exit" onClick={() => exitDemo('/')}>Back to the real Kitside</button>
       </div>
@@ -123,21 +136,24 @@ export function PreviewBanner() {
 }
 
 export function Footer() {
+  const showNav = useShowNav();
   return (
     <footer className="footer">
       <div className="footer-inner">
         <div>
           <Logo />
-          <p className="footer-line">Good people, right nearby. Made in Kitsilano, Vancouver.</p>
+          <p className="footer-line">A small community for people building things in Kits. Made in Kitsilano, Vancouver.</p>
         </div>
         <nav className="footer-links" aria-label="Footer">
-          {NAV.map((n) => <Link key={n.to} to={n.to}>{n.label}</Link>)}
-          <Link to="/join">Join Kitside</Link>
+          {showNav && NAV.map((n) => <Link key={n.to} to={n.to}>{n.label}</Link>)}
+          {showNav && <Link to="/note">Sunday note</Link>}
+          {!showNav && <Link to="/login">Log in</Link>}
+          {!showNav && <Link to="/join">I have an invite</Link>}
           {MODE === 'live' && <DemoButton className="text-btn footer-demo">See the demo</DemoButton>}
         </nav>
         <p className="footer-fine">
-          {DISCLAIMER}{(MODE !== 'live' || SHOW_DEMO) && ' People, activities and posts marked “Example” are fictional and show how Kitside works.'}{' '}
-          Kitside only ever shows neighbourhood-level locations.
+          {DISCLAIMER}{(MODE !== 'live' || SHOW_DEMO) && ' Anything marked “Example” is fictional and shows how Kitside works.'}{' '}
+          Kitside only ever shows neighbourhood-level locations. Photos by the founder, taken in Kits.
         </p>
       </div>
     </footer>
