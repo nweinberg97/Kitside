@@ -465,6 +465,30 @@ export const localBackend = {
     commit();
   },
 
+  /** Demo only: skip sign-up and walk in as a new organizer (first real member). */
+  async demoQuickJoin() {
+    await wait();
+    const d = getDb();
+    let u = d.users.find((x) => x.email === 'you@demo.kitside');
+    if (!u) {
+      u = { id: uid(), email: 'you@demo.kitside', name: 'You', passwordHash: await hash(uid()) };
+      d.users.push(u);
+      d.redeemed.push(u.id);
+    }
+    if (!profileById(u.id)) {
+      const first = realMembers().length === 0;
+      d.profiles = [{
+        id: u.id, name: 'You', role: 'Founder', title: 'Organizer of Kitside', bio: '', neighbourhood: 'Kitsilano',
+        interests: ['Running', 'Startups', 'AI'], lookingFor: ['Collaborators', 'Meet people'], workingOn: 'Getting Kitside ready for the first five people',
+        isRemote: false, linkedinUrl: '', instagram: '', contactEmail: 'you@example.com', weeklyNote: true,
+        isHost: first, isAdmin: first, invitedBy: null, avatarUrl: '', avatarHue: 32, isDemo: false, createdAt: new Date().toISOString(),
+      }, ...d.profiles];
+      d.updates.push({ id: uid(), authorId: u.id, kind: 'working_on', body: 'Getting Kitside ready for the first five people', resolved: false, isDemo: false, createdAt: new Date().toISOString() });
+    }
+    d.session = { userId: u.id };
+    commit(); emit();
+  },
+
   /** Browser-only: wipe this copy and start again from the demo data. */
   async resetPreview() {
     db = freshDb();

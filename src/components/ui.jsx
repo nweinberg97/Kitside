@@ -1,12 +1,13 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { firstName } from '../lib/format.js';
 import { Link } from '../lib/router.jsx';
 
 export function Avatar({ profile, size = 48 }) {
   const name = profile?.name || 'A member';
+  const [failed, setFailed] = useState(false);
   const style = { width: size, height: size, fontSize: size * 0.42, '--hue': profile?.avatarHue ?? 160 };
-  if (profile?.avatarUrl) {
-    return <img className="avatar" src={profile.avatarUrl} alt="" style={style} referrerPolicy="no-referrer" />;
+  if (profile?.avatarUrl && !failed) {
+    return <img className="avatar" src={profile.avatarUrl} alt="" style={style} referrerPolicy="no-referrer" loading="lazy" onError={() => setFailed(true)} />;
   }
   return <span className="avatar" style={style} aria-hidden="true">{firstName(name)[0]?.toUpperCase()}</span>;
 }

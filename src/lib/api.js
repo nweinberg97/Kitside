@@ -61,4 +61,5 @@ export const api = {
   setBlocked: call('setBlocked'),
   report: call('report'),
   resetPreview: () => localBackend.resetPreview(),
+  demoQuickJoin: () => localBackend.demoQuickJoin(),
 };

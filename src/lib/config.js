@@ -29,7 +29,7 @@ export const MODE = IN_DEMO ? 'demo' : IS_LIVE ? 'live' : 'preview';
 export function enterDemo(to = '/') {
   try {
     window.localStorage.setItem(DEMO_FLAG, '1');
-    window.localStorage.removeItem('kitside:demo:v1'); // every visit starts from fresh sample data
+    window.localStorage.removeItem('kitside:demo:v2'); // every visit starts from fresh sample data
   } catch { /* storage blocked: the demo can't switch on */ }
   window.location.hash = to;
   window.location.reload();

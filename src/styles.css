@@ -623,3 +623,28 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--b
   .bottomnav a { font-size: 10.5px; }
   .head-actions { width: 100%; }
 }
+
+/* ---------- Sandbox guide (demo / preview only) ---------- */
+.guide { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: 20px; z-index: 70; width: 320px; max-height: calc(100vh - 140px); overflow: auto; background: var(--paper); border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 24px 60px -24px rgba(15, 30, 26, .45); padding: 14px; display: grid; gap: 10px; animation: card-in .3s var(--ease); }
+.guide-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.guide-head div { display: grid; line-height: 1.25; }
+.guide-head strong { font-family: var(--display); font-size: 17px; }
+.guide-head span { font-size: 12.5px; color: var(--ink-3); }
+.guide-join { background: var(--sun-soft); border-radius: 14px; padding: 12px; display: grid; gap: 8px; font-size: 14px; color: #4F3C11; }
+.guide-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.guide-steps a { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 10px; align-items: start; padding: 8px; border-radius: 12px; text-decoration: none; color: var(--ink); }
+.guide-steps a:hover { background: var(--fog); color: var(--ink); }
+.guide-steps li.is-here a { background: #E3EEE5; }
+.guide-steps strong { display: block; font-size: 14.5px; }
+.guide-steps small { display: block; font-size: 13px; color: var(--ink-2); line-height: 1.35; }
+.guide-dot { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; border: 1.5px solid var(--line); color: var(--ink-3); }
+.guide-steps li.is-seen .guide-dot { background: var(--kelp); border-color: var(--kelp); color: #fff; }
+.guide-tips { margin: 0; padding: 10px 12px 10px 28px; background: var(--fog); border-radius: 12px; font-size: 13px; color: var(--ink-2); display: grid; gap: 4px; }
+.guide-foot { display: flex; justify-content: flex-end; }
+.guide-fab { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: 20px; z-index: 70; border: 0; border-radius: 999px; padding: 10px 16px; background: var(--ink); color: var(--paper); font-weight: 600; font-size: 14px; cursor: pointer; box-shadow: var(--lift); }
+.demo-join { background: var(--paper); color: var(--ink); }
+.demo-join:hover { background: #fff; }
+@media (max-width: 760px) {
+  .guide { left: 12px; right: 12px; width: auto; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); max-height: 60vh; }
+  .guide-fab { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+}

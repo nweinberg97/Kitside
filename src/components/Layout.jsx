@@ -1,4 +1,5 @@
 import { enterDemo, exitDemo, MODE, SHOW_DEMO } from '../lib/config.js';
+import { api } from '../lib/api.js';
 import { DISCLAIMER } from '../lib/constants.js';
 import { Link } from '../lib/router.jsx';
 import { useSession } from '../state/session.jsx';
@@ -113,6 +114,16 @@ export function DemoButton({ className = 'btn btn-demo btn-lg', children = 'See 
   );
 }
 
+function DemoJoin() {
+  const { isMember } = useSession();
+  if (isMember) return null;
+  return (
+    <button type="button" className="demo-exit demo-join" onClick={() => api.demoQuickJoin()}>
+      Skip sign-up, try it as the organizer
+    </button>
+  );
+}
+
 export function PreviewBanner() {
   if (MODE === 'demo') {
     return (
@@ -120,6 +131,7 @@ export function PreviewBanner() {
         <p>
           <strong>You’re in the demo.</strong> These members are made up, and anything you do here stays in this browser.
         </p>
+        <DemoJoin />
         <button type="button" className="demo-exit" onClick={() => exitDemo('/')}>Back to the real Kitside</button>
       </div>
     );
@@ -153,7 +165,7 @@ export function Footer() {
         </nav>
         <p className="footer-fine">
           {DISCLAIMER}{(MODE !== 'live' || SHOW_DEMO) && ' Anything marked “Example” is fictional and shows how Kitside works.'}{' '}
-          Kitside only ever shows neighbourhood-level locations. Photos by the founder, taken in Kits.
+          Kitside only ever shows neighbourhood-level locations. Landing photos by the founder, taken in Kits. Example member photos from Unsplash.
         </p>
       </div>
     </footer>

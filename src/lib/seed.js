@@ -20,6 +20,16 @@
 const HOSTS = [2, 3, 12, 14];
 const INVITED_BY = { 2: 1, 3: 1, 4: 3, 5: 2, 6: 3, 7: 2, 8: 3, 9: 14, 10: 12, 11: 3, 12: 1, 13: 5, 14: 2 };
 
+// Profile photos: the same Unsplash portraits Jumpin uses (Unsplash License).
+const PHOTOS = {
+  1: '1745434159123-4908d0b9df94', 2: '1625241152315-4a698f74ceb7', 3: '1758337082707-e3fbd71ed461',
+  4: '1500648767791-00dcc994a43e', 5: '1576110598658-096ae24cdb97', 6: '1592275772614-ec71b19e326f',
+  7: '1757744705465-ea08b0ddc38a', 8: '1494790108377-be9c29b29330', 9: '1757700314602-d0971e793203',
+  10: '1779338192178-e9333695d868', 11: '1507003211169-0a1dd7228f2d', 12: '1580489944761-15a19d654956',
+  13: '1581714161666-dade083654ae', 14: '1662850886700-4ec19bd30d11',
+};
+const photo = (n) => (PHOTOS[n] ? `https://images.unsplash.com/photo-${PHOTOS[n]}?w=240&h=240&fit=crop&crop=faces&q=80&auto=format` : '');
+
 const id = (n) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
 
 export const DEMO_PROFILES = [
@@ -66,7 +76,7 @@ export const DEMO_PROFILES = [
     lookingFor: ['Fitness buddies', 'Mentors', 'Friends'], isRemote: false,
   },
   {
-    n: 7, name: 'Ethan Liu', role: 'Engineering', title: 'Machine learning engineer', neighbourhood: 'Fairview', hue: 225,
+    n: 7, name: 'Ethan Ward', role: 'Engineering', title: 'Machine learning engineer', neighbourhood: 'Fairview', hue: 225,
     bio: 'Works on medical imaging by day. Cooks one ambitious dinner a week and needs people to help eat it.',
     workingOn: 'A tiny app for splitting grocery runs',
     interests: ['Cooking', 'AI', 'Cycling', 'Food'],
@@ -139,7 +149,7 @@ export const DEMO_PROFILES = [
   isHost: HOSTS.includes(p.n),
   isAdmin: false,
   invitedBy: p.n === 1 ? null : id(INVITED_BY[p.n] || 1),
-  avatarUrl: '',
+  avatarUrl: photo(p.n),
   avatarHue: p.hue,
   isDemo: true,
   createdAt: new Date(Date.now() - (30 - p.n) * 86400e3).toISOString(),

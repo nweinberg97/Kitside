@@ -1,4 +1,5 @@
 import { BottomNav, DemoButton, Footer, PreviewBanner, TopNav } from './components/Layout.jsx';
+import SandboxGuide from './components/SandboxGuide.jsx';
 import { EmptyState } from './components/ui.jsx';
 import { Link, Redirect, useRoute } from './lib/router.jsx';
 import { MODE } from './lib/config.js';
@@ -24,7 +25,9 @@ function Page({ route }) {
   const open = isMember || MODE !== 'live';
   if (MEMBER_PAGES.includes(route.name) && !open) return loading ? null : <MembersOnly />;
   switch (route.name) {
-    case 'home': return isMember || (MODE !== 'live' && route.query.get('view') !== 'landing') ? <Week /> : loading ? null : <Landing />;
+    case 'home':
+      if (route.query.get('view') === 'landing') return <Landing />;
+      return isMember || MODE !== 'live' ? <Week /> : loading ? null : <Landing />;
     case 'people': return <People />;
     case 'person': return <Person id={route.params.id} />;
     case 'updates': return <Updates tab={route.query.get('tab')} />;
@@ -60,7 +63,7 @@ export default function App() {
   const route = useRoute();
   const { user, profile, loading, isMember } = useSession();
   const needsOnboarding = !loading && user && !profile && !['welcome', 'join', 'login'].includes(route.name);
-  const isHome = route.name === 'home' && !isMember && (MODE === 'live' || route.query.get('view') === 'landing');
+  const isHome = route.name === 'home' && (route.query.get('view') === 'landing' || (!isMember && MODE === 'live'));
 
   return (
     <div className={`app route-${route.name} ${isHome ? 'is-landing' : ''}`}>
@@ -72,6 +75,7 @@ export default function App() {
       </main>
       <Footer />
       <BottomNav route={route} />
+      {MODE !== 'live' && <SandboxGuide route={route} />}
     </div>
   );
 }
