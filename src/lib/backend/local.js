@@ -32,7 +32,7 @@ function freshDb() {
     activities: DEMO_ACTIVITIES.map((a) => ({
       id: a.id, hostId: a.hostId, title: a.title, description: a.description, category: a.category,
       location: a.location, startsAt: nextOccurrence(a.weekday, a.time).toISOString(), isDemo: true,
-      isSession: a.isSession, dinnerPlace: a.dinnerPlace, dinnerTime: a.dinnerTime, dinnerMin: a.dinnerMin,
+      isSession: a.isSession, dinnerPlace: a.dinnerPlace, dinnerTime: a.dinnerTime, dinnerMin: a.dinnerMin, cover: a.cover || '',
     })),
     activityInterests: DEMO_ACTIVITIES.flatMap((a) => a.interested.map((p) => ({ activityId: a.id, profileId: p, dinner: a.dinner.includes(p) }))),
     updates: DEMO_UPDATES.map((u) => ({
@@ -41,7 +41,7 @@ function freshDb() {
     })),
     updateHelpers: DEMO_UPDATES.flatMap((u) => u.helpers.map((p) => ({ updateId: u.id, profileId: p }))),
     spots: DEMO_SPOTS.map((s) => ({
-      id: s.id, addedBy: s.addedBy, name: s.name, area: s.area, note: s.note, tags: s.tags, isDemo: true,
+      id: s.id, addedBy: s.addedBy, name: s.name, area: s.area, note: s.note, tags: s.tags, photo: s.photo || '', isDemo: true,
       createdAt: new Date(now - 20 * DAY + Number(s.id.slice(-3)) * HOUR).toISOString(),
     })),
     spotRegulars: DEMO_SPOTS.flatMap((s) => s.regulars.map((p) => ({ spotId: s.id, profileId: p }))),
@@ -402,7 +402,7 @@ export const localBackend = {
   async createSpot(fields) {
     await wait();
     const me = requireMember();
-    const s = { id: uid(), addedBy: me.id, isDemo: false, createdAt: new Date().toISOString(), tags: [], area: '', note: '', ...fields };
+    const s = { id: uid(), addedBy: me.id, isDemo: false, createdAt: new Date().toISOString(), tags: [], area: '', note: '', photo: '', ...fields };
     getDb().spots.push(s);
     getDb().spotRegulars.push({ spotId: s.id, profileId: me.id });
     commit();

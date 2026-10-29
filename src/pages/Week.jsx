@@ -58,7 +58,7 @@ export default function Week() {
             <SessionCard key={view.session.id} session={view.session} peopleById={view.peopleById} />
           ) : (
             <div className="session session-empty">
-              <div className="session-photo" aria-hidden="true" style={{ backgroundImage: `url(${import.meta.env.BASE_URL}img/kits-point-evening.jpg)` }} />
+              <div className="session-photo" aria-hidden="true" style={{ backgroundImage: `url(${import.meta.env.BASE_URL}img/covers/point.jpg)` }} />
               <div className="session-body">
                 <p className="session-kicker">The weekly session</p>
                 <h2>Nothing planned yet this week.</h2>

@@ -48,7 +48,7 @@ const fromProfile = (p) => ({
 const toActivity = (r) => ({
   id: r.id, hostId: r.host_id, host: toProfile(r.host), title: r.title, description: r.description || '',
   category: r.category, location: r.location, startsAt: r.starts_at, isDemo: !!r.is_demo,
-  isSession: !!r.is_session, dinnerPlace: r.dinner_place || '', dinnerTime: r.dinner_time?.slice(0, 5) || null, dinnerMin: r.dinner_min ?? 3,
+  cover: r.cover || '', isSession: !!r.is_session, dinnerPlace: r.dinner_place || '', dinnerTime: r.dinner_time?.slice(0, 5) || null, dinnerMin: r.dinner_min ?? 3,
   interestedIds: (r.activity_interests || []).map((i) => i.profile_id),
   dinnerIds: (r.activity_interests || []).filter((i) => i.dinner).map((i) => i.profile_id),
 });
@@ -61,7 +61,7 @@ const toUpdate = (r) => ({
 
 const toSpot = (r) => ({
   id: r.id, addedBy: r.added_by, addedByProfile: toProfile(r.adder), name: r.name, area: r.area || '', note: r.note || '',
-  tags: r.tags || [], isDemo: !!r.is_demo, createdAt: r.created_at,
+  tags: r.tags || [], photo: r.photo_url || '', isDemo: !!r.is_demo, createdAt: r.created_at,
   regularIds: (r.spot_regulars || []).map((x) => x.profile_id),
 });
 
@@ -212,7 +212,7 @@ export const supabaseBackend = {
       .from('activities')
       .insert({
         host_id: user.id, title: f.title, description: f.description, category: f.category, location: f.location, starts_at: f.startsAt,
-        is_session: !!f.isSession, dinner_place: f.dinnerPlace || '', dinner_time: f.dinnerTime || null, dinner_min: f.dinnerMin || 3,
+        cover: f.cover || '', is_session: !!f.isSession, dinner_place: f.dinnerPlace || '', dinner_time: f.dinnerTime || null, dinner_min: f.dinnerMin || 3,
       })
       .select(ACTIVITY_SELECT)
       .single();
@@ -288,7 +288,7 @@ export const supabaseBackend = {
   async createSpot(f) {
     const user = await requireUser();
     const { data, error } = await sb.from('spots')
-      .insert({ added_by: user.id, name: f.name, area: f.area || '', note: f.note || '', tags: f.tags || [] })
+      .insert({ added_by: user.id, name: f.name, area: f.area || '', note: f.note || '', tags: f.tags || [], photo_url: f.photo || '' })
       .select('*, adder:profiles!spots_added_by_fkey(*), spot_regulars(profile_id)').single();
     fail(error);
     await sb.from('spot_regulars').insert({ spot_id: data.id, profile_id: user.id });

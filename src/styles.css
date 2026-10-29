@@ -123,6 +123,12 @@ p { margin: 0; }
 .place { display: inline-flex; align-items: center; gap: 5px; color: var(--ink-3); font-size: 14px; }
 .pin-icon { flex: none; }
 
+/* ---------- Grids ---------- */
+.grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.grid-people { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 16px; }
+.stack { display: grid; gap: 14px; }
+
 /* ---------- Person card ---------- */
 .person-card {
   display: flex; flex-direction: column; gap: 14px;
@@ -146,11 +152,10 @@ p { margin: 0; }
 .person-card.is-compact { position: relative; }
 .person-card.is-compact .demo-tag { top: 16px; right: 16px; }
 
-/* ---------- Activity card ---------- */
+/* ---------- Event card: photo banner with a date badge ---------- */
 .activity-card {
   --tone: var(--slate);
-  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px;
-  padding: 18px 20px 18px 18px; background: var(--paper); border: 1px solid var(--line-2); border-radius: var(--r-card);
+  display: flex; flex-direction: column; background: var(--paper); border: 1px solid var(--line-2); border-radius: var(--r-card); overflow: hidden;
   transition: box-shadow .2s var(--ease), transform .2s var(--ease);
 }
 .activity-card:hover { box-shadow: var(--lift); transform: translateY(-2px); }
@@ -160,12 +165,20 @@ p { margin: 0; }
 .tone-clay { --tone: var(--berry); }
 .tone-moss { --tone: var(--moss); }
 .tone-sun { --tone: #A87412; }
-.date-tag { width: 62px; padding: 9px 0 10px; border-radius: 14px; background: color-mix(in srgb, var(--tone) 12%, var(--paper)); color: var(--tone); text-align: center; display: grid; align-content: start; }
-.date-tag-day { font-size: 13px; font-weight: 600; }
-.date-tag-num { font-family: var(--display); font-size: 28px; font-weight: 700; line-height: 1.05; letter-spacing: -.03em; }
-.activity-body { min-width: 0; display: grid; gap: 6px; }
-.activity-meta { display: flex; align-items: center; gap: 8px; min-height: 22px; }
-.activity-meta .more { margin-left: auto; margin-top: -6px; margin-right: -8px; }
+.activity-banner { position: relative; aspect-ratio: 16 / 7; max-width: 100%; background: var(--sky); overflow: hidden; }
+.activity-banner img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s var(--ease); }
+.activity-card:hover .activity-banner img { transform: scale(1.03); }
+.activity-banner::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10, 20, 18, .28), rgba(10, 20, 18, 0) 45%); pointer-events: none; }
+.date-badge { position: absolute; left: 14px; top: 14px; z-index: 2; display: grid; justify-items: center; min-width: 58px; padding: 7px 8px 6px; border-radius: 14px; background: rgba(250, 251, 247, .96); color: var(--ink); box-shadow: 0 8px 20px -10px rgba(0, 0, 0, .5); line-height: 1; }
+.date-badge-day { font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--tone, var(--kelp)); }
+.date-badge-num { font-family: var(--display); font-size: 30px; font-weight: 780; letter-spacing: -.04em; margin: 3px 0 2px; }
+.date-badge-mon { font-size: 11px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: .06em; }
+.banner-tags { position: absolute; right: 12px; top: 12px; z-index: 2; display: flex; gap: 6px; align-items: center; }
+.category-chip { background: rgba(250, 251, 247, .94); padding: 4px 10px; border-radius: 999px; }
+.banner-tags .demo-tag { background: rgba(250, 251, 247, .94); border-style: solid; border-color: transparent; }
+.activity-body { min-width: 0; display: grid; gap: 6px; padding: 16px 18px 18px; }
+.activity-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.activity-title-row .more { margin: -4px -8px 0 0; }
 .category { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--tone, var(--ink-2)); }
 .category::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
 .activity-card h3 { font-size: 21px; }
@@ -177,6 +190,12 @@ p { margin: 0; }
 .person-link { color: var(--ink); font-weight: 600; text-decoration: none; }
 .person-link:hover { text-decoration: underline; color: var(--ink); }
 .activity-card.is-compact .activity-foot { margin-top: 4px; }
+
+/* Banner picker in the host dialog */
+.cover-picker { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.cover-option { padding: 0; border: 2px solid transparent; border-radius: 12px; overflow: hidden; aspect-ratio: 2 / 1; max-width: 100%; cursor: pointer; background: var(--sky); }
+.cover-option img { width: 100%; height: 100%; object-fit: cover; }
+.cover-option.is-on { border-color: var(--ink); box-shadow: 0 0 0 2px var(--sun); }
 
 /* ---------- Interest button ---------- */
 .interest { display: inline-flex; align-items: center; gap: 12px; }
@@ -370,8 +389,6 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--b
   .grid-4 { grid-template-columns: 1fr 1fr; gap: 10px; }
   .person-card.is-compact { padding: 14px; }
   .person-card.is-compact .person-card-into { display: none; }
-  .activity-card { grid-template-columns: 1fr; gap: 12px; padding: 16px; }
-  .date-tag { display: none; }
   .field-row, .field-row-3 { grid-template-columns: 1fr; }
   .profile-head { flex-direction: column; align-items: flex-start; position: relative; }
   .profile-head .more { position: absolute; top: 0; right: 0; }
@@ -429,11 +446,11 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--b
 .push-right { margin-left: auto; }
 .code-input { font-family: ui-monospace, 'SF Mono', Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; }
 .host-badge { display: inline-flex; align-items: center; vertical-align: middle; font-family: var(--text); font-size: 11.5px; font-weight: 650; letter-spacing: .02em; padding: 2px 8px; border-radius: 999px; background: #DDEAE0; color: var(--kelp); }
-.grid-people { grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); }
 
 /* ---------- Session card ---------- */
 .session { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); background: var(--paper); border: 1px solid var(--line-2); border-radius: 26px; overflow: hidden; }
-.session-photo { min-height: 260px; background: var(--sky) center 40% / cover no-repeat; }
+.session-photo { position: relative; min-height: 260px; background: var(--sky) center 40% / cover no-repeat; }
+.session-photo .date-badge { --tone: var(--kelp); }
 .session-body { padding: clamp(20px, 3.4vw, 34px); display: grid; gap: 10px; align-content: start; }
 .session-kicker { font-size: 14px; font-weight: 650; color: var(--kelp); display: flex; gap: 8px; align-items: center; }
 .session h2 { font-size: clamp(28px, 3.4vw, 40px); font-weight: 750; letter-spacing: -.035em; }
@@ -490,7 +507,11 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--b
 
 /* Spots */
 .grid-spots { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
-.spot-card { display: grid; gap: 8px; align-content: start; padding: 20px; background: var(--paper); border: 1px solid var(--line-2); border-radius: var(--r-card); }
+.spot-card { display: grid; gap: 8px; align-content: start; padding: 0 20px 18px; background: var(--paper); border: 1px solid var(--line-2); border-radius: var(--r-card); overflow: hidden; }
+.spot-photo { position: relative; margin: 0 -20px 6px; aspect-ratio: 3 / 2; max-width: none; background: var(--sky); overflow: hidden; }
+.spot-photo img { width: 100%; height: 100%; object-fit: cover; }
+.spot-photo .demo-tag { position: absolute; top: 12px; right: 12px; background: rgba(250, 251, 247, .94); border-style: solid; border-color: transparent; }
+.spot-count { position: absolute; left: 12px; bottom: 12px; font-size: 12.5px; font-weight: 650; padding: 4px 10px; border-radius: 999px; background: rgba(23, 48, 42, .82); color: #fff; }
 .spot-top { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
 .spot-card h3 { font-size: 21px; }
 .spot-note { color: var(--ink-2); }

@@ -28,6 +28,7 @@ const PHOTOS = {
   10: '1779338192178-e9333695d868', 11: '1507003211169-0a1dd7228f2d', 12: '1580489944761-15a19d654956',
   13: '1581714161666-dade083654ae', 14: '1662850886700-4ec19bd30d11',
 };
+const UNSPLASH = (id, w = 900, h = 600) => `https://images.unsplash.com/photo-${id}?w=${w}&h=${h}&fit=crop&q=75&auto=format`;
 const photo = (n) => (PHOTOS[n] ? `https://images.unsplash.com/photo-${PHOTOS[n]}?w=240&h=240&fit=crop&crop=faces&q=80&auto=format` : '');
 
 const id = (n) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
@@ -165,26 +166,26 @@ export const DEMO_ACTIVITIES = [
   {
     n: 101, host: 2, title: 'Build & Break Bread', category: 'Build', location: 'Tidewater Café, West 4th', weekday: 3, time: '16:00',
     description: 'Bring whatever you’re working on. Quick round of what everyone’s on, then heads down. Dinner after for whoever’s staying.',
-    isSession: true, dinnerPlace: 'Larch Street Kitchen', dinnerTime: '18:30', dinnerMin: 3,
+    isSession: true, dinnerPlace: 'Larch Street Kitchen', dinnerTime: '18:30', dinnerMin: 3, cover: 'park',
     interested: [2, 1, 8, 11, 13, 3], dinner: [2, 8, 11],
   },
   {
-    n: 102, host: 14, title: 'Saturday run', category: 'Move', location: 'Point Grey Road', weekday: 6, time: '09:00',
+    n: 102, host: 14, title: 'Saturday run', category: 'Move', location: 'Point Grey Road', weekday: 6, time: '09:00', cover: 'shore',
     description: 'Easy 5K out and back along the water. Coffee after for anyone who wants it.',
     interested: [14, 1, 4, 6, 9, 12],
   },
   {
-    n: 103, host: 12, title: 'Sunset sea swim', category: 'Move', location: 'Kits Beach', weekday: 2, time: '18:15',
+    n: 103, host: 12, title: 'Sunset sea swim', category: 'Move', location: 'Kits Beach', weekday: 2, time: '18:15', cover: 'waves',
     description: 'A short dip near shore. Wetsuits welcome.',
     interested: [12, 10, 5, 3],
   },
   {
-    n: 104, host: 3, title: 'Founder breakfast', category: 'Eat', location: 'West 4th', weekday: 5, time: '08:00',
+    n: 104, host: 3, title: 'Founder breakfast', category: 'Eat', location: 'West 4th', weekday: 5, time: '08:00', cover: 'point',
     description: 'Eggs and one honest question each about what’s hard right now. Six seats.',
     interested: [3, 11, 8, 2],
   },
 ].map((a) => ({
-  isSession: false, dinnerPlace: '', dinnerTime: null, dinnerMin: 3,
+  isSession: false, dinnerPlace: '', dinnerTime: null, dinnerMin: 3, cover: '',
   ...a, id: id(a.n), hostId: pid(a.host), interested: a.interested.map(pid), dinner: (a.dinner || []).map(pid), isDemo: true,
 }));
 
@@ -204,17 +205,19 @@ export const DEMO_UPDATES = [
 ].map((u) => ({ ...u, id: id(u.n), authorId: pid(u.author), helpers: (u.helpers || []).map(pid), isDemo: true }));
 
 export const DEMO_SPOTS = [
-  { n: 301, by: 2, name: 'Tidewater Café', area: 'West 4th', note: 'Big tables, good wifi, fine with laptops before 2pm.', tags: ['Coffee', 'Laptop-friendly'], regulars: [2, 1, 8, 13] },
-  { n: 302, by: 3, name: 'Larch Street Kitchen', area: 'Kitsilano', note: 'Long tables. Takes groups of eight if you call ahead.', tags: ['Dinner', 'Groups'], regulars: [3, 11, 8] },
-  { n: 303, by: 12, name: 'Kits Beach logs', area: 'Kits Beach', note: 'Sunset hangs by the volleyball courts. Bring a layer.', tags: ['Outdoors', 'Groups'], regulars: [12, 5, 10, 6, 14] },
-  { n: 304, by: 8, name: 'The Arbutus Room', area: 'West Broadway', note: 'Quiet after-dinner drinks, easier to talk on weeknights.', tags: ['Drinks'], regulars: [8, 4] },
-  { n: 305, by: 14, name: 'Kits Pool', area: 'Kits Beach', note: 'Laps in summer, then coffee across the street.', tags: ['Fitness', 'Outdoors'], regulars: [14, 12] },
+  { n: 301, by: 2, photo: UNSPLASH('1764391836704-8053c8a6e209'), name: 'Tidewater Café', area: 'West 4th', note: 'Big tables, good wifi, fine with laptops before 2pm.', tags: ['Coffee', 'Laptop-friendly'], regulars: [2, 1, 8, 13] },
+  { n: 302, by: 3, photo: UNSPLASH('1670899460364-ebc917bac09a'), name: 'Larch Street Kitchen', area: 'Kitsilano', note: 'Long tables. Takes groups of eight if you call ahead.', tags: ['Dinner', 'Groups'], regulars: [3, 11, 8] },
+  { n: 303, by: 12, photo: 'cover:park', name: 'Kits Beach logs', area: 'Kits Beach', note: 'Sunset hangs by the volleyball courts. Bring a layer.', tags: ['Outdoors', 'Groups'], regulars: [12, 5, 10, 6, 14] },
+  { n: 304, by: 8, photo: UNSPLASH('1760982192590-de2b005bb4d5'), name: 'The Arbutus Room', area: 'West Broadway', note: 'Quiet after-dinner drinks, easier to talk on weeknights.', tags: ['Drinks'], regulars: [8, 4] },
+  { n: 305, by: 14, photo: UNSPLASH('1545960122-23d7d68938a6'), name: 'Kits Pool', area: 'Kits Beach', note: 'Laps in summer, then coffee across the street.', tags: ['Fitness', 'Outdoors'], regulars: [14, 12] },
 ].map((s) => ({ ...s, id: id(s.n), addedBy: pid(s.by), regulars: s.regulars.map(pid), isDemo: true }));
 
 export const DEMO_TAKEAWAYS = [
-  { n: 401, author: 11, daysAgo: 2, title: 'Charge from day one', body: 'Our first shop paid $40 a month before the product was finished. Asking early told us more than any survey did.' },
-  { n: 402, author: 12, daysAgo: 9, title: 'Five interviews beat fifty surveys', body: 'Patterns show up by the fifth conversation. After that you’re mostly hearing them again.' },
-  { n: 403, author: 1, daysAgo: 16, title: 'Write the README first', body: 'If you can’t explain it in a paragraph, you’re not ready to build it.' },
+  { n: 401, author: 11, daysAgo: 2, title: 'Put a price on it before you build it', body: 'I pitched the bike-shop tool at $40 a month with nothing but screenshots. Three shops said yes, eleven said no, and the no’s told me exactly which feature to cut.' },
+  { n: 402, author: 12, daysAgo: 6, title: 'Ask about last Tuesday, not “would you use this?”', body: 'People are bad at predicting what they’ll do and good at remembering what they did. “Walk me through the last time this happened” gets you real answers.' },
+  { n: 403, author: 3, daysAgo: 11, title: 'Hire for the job in six months, not this week', body: 'My first engineer was perfect for the prototype and miserable once we had paying customers. Write down what the role looks like at month six, then interview for that.' },
+  { n: 404, author: 8, daysAgo: 15, title: 'Your first hundred customers come from one channel', body: 'Every company I’ve worked with found its first hundred in a single place. Splitting effort across five channels just makes all five look like they don’t work.' },
+  { n: 405, author: 2, daysAgo: 23, title: 'Ship the boring version first', body: 'We spent a month on a real-time sync engine. A nightly CSV export would have shown us in a week that nobody needed real-time.' },
 ].map((t) => ({ ...t, id: id(t.n), authorId: pid(t.author), isDemo: true }));
 
 /** Next occurrence (local time) of a weekday at HH:MM, today included if still ahead. */

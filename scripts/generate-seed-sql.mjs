@@ -30,15 +30,15 @@ begin;
 out.push(insert('profiles', 'id, name, role, title, bio, neighbourhood, interests, looking_for, working_on, is_remote, avatar_hue, avatar_url, contact_email, is_host, is_demo',
   DEMO_PROFILES.map((p) => `  (${q(p.id)}, ${q(p.name)}, ${q(p.role)}, ${q(p.title)}, ${q(p.bio)}, ${q(p.neighbourhood)}, ${arr(p.interests)}, ${arr(p.lookingFor)}, ${q(p.workingOn)}, ${p.isRemote}, ${p.avatarHue}, ${q(p.avatarUrl)}, ${q(p.contactEmail)}, ${p.isHost}, true)`)));
 out.push(`update public.profiles p set invited_by = v.inviter from (values\n${DEMO_PROFILES.filter((p) => p.invitedBy).map((p) => `  (${q(p.id)}::uuid, ${q(p.invitedBy)}::uuid)`).join(',\n')}\n) v(id, inviter) where p.id = v.id and p.is_demo and p.invited_by is null;\n`);
-out.push(insert('activities', 'id, host_id, title, description, category, location, starts_at, is_session, dinner_place, dinner_time, dinner_min, is_demo',
-  DEMO_ACTIVITIES.map((a) => `  (${q(a.id)}, ${q(a.hostId)}, ${q(a.title)}, ${q(a.description)}, ${q(a.category)}, ${q(a.location)}, ${nextAt(a.weekday, a.time)}, ${a.isSession}, ${q(a.dinnerPlace)}, ${a.dinnerTime ? `time '${a.dinnerTime}'` : 'null'}, ${a.dinnerMin}, true)`)));
+out.push(insert('activities', 'id, host_id, title, description, category, location, starts_at, is_session, dinner_place, dinner_time, dinner_min, cover, is_demo',
+  DEMO_ACTIVITIES.map((a) => `  (${q(a.id)}, ${q(a.hostId)}, ${q(a.title)}, ${q(a.description)}, ${q(a.category)}, ${q(a.location)}, ${nextAt(a.weekday, a.time)}, ${a.isSession}, ${q(a.dinnerPlace)}, ${a.dinnerTime ? `time '${a.dinnerTime}'` : 'null'}, ${a.dinnerMin}, ${q(a.cover || '')}, true)`)));
 out.push(insert('activity_interests', 'activity_id, profile_id, dinner',
   DEMO_ACTIVITIES.flatMap((a) => a.interested.map((p) => `  (${q(a.id)}, ${q(p)}, ${a.dinner.includes(p)})`)), ''));
 out.push(insert('updates', 'id, author_id, kind, body, is_demo, created_at',
   DEMO_UPDATES.map((u) => `  (${q(u.id)}, ${q(u.authorId)}, ${q(u.kind)}, ${q(u.body)}, true, now() - interval '${u.hoursAgo} hours')`)));
 out.push(insert('update_helpers', 'update_id, profile_id', DEMO_UPDATES.flatMap((u) => u.helpers.map((p) => `  (${q(u.id)}, ${q(p)})`)), ''));
-out.push(insert('spots', 'id, added_by, name, area, note, tags, is_demo',
-  DEMO_SPOTS.map((s) => `  (${q(s.id)}, ${q(s.addedBy)}, ${q(s.name)}, ${q(s.area)}, ${q(s.note)}, ${arr(s.tags)}, true)`)));
+out.push(insert('spots', 'id, added_by, name, area, note, tags, photo_url, is_demo',
+  DEMO_SPOTS.map((s) => `  (${q(s.id)}, ${q(s.addedBy)}, ${q(s.name)}, ${q(s.area)}, ${q(s.note)}, ${arr(s.tags)}, ${q(s.photo || '')}, true)`)));
 out.push(insert('spot_regulars', 'spot_id, profile_id', DEMO_SPOTS.flatMap((s) => s.regulars.map((p) => `  (${q(s.id)}, ${q(p)})`)), ''));
 out.push(insert('takeaways', 'id, author_id, title, body, is_demo, created_at',
   DEMO_TAKEAWAYS.map((t) => `  (${q(t.id)}, ${q(t.authorId)}, ${q(t.title)}, ${q(t.body)}, true, now() - interval '${t.daysAgo} days')`)));

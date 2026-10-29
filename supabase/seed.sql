@@ -40,19 +40,19 @@ update public.profiles p set invited_by = v.inviter from (values
   ('00000000-0000-4000-8000-000000000014'::uuid, '00000000-0000-4000-8000-000000000002'::uuid)
 ) v(id, inviter) where p.id = v.id and p.is_demo and p.invited_by is null;
 
-insert into public.activities (id, host_id, title, description, category, location, starts_at, is_session, dinner_place, dinner_time, dinner_min, is_demo) values
+insert into public.activities (id, host_id, title, description, category, location, starts_at, is_session, dinner_place, dinner_time, dinner_min, cover, is_demo) values
   ('00000000-0000-4000-8000-000000000101', '00000000-0000-4000-8000-000000000002', 'Build & Break Bread', 'Bring whatever you’re working on. Quick round of what everyone’s on, then heads down. Dinner after for whoever’s staying.', 'Build', 'Tidewater Café, West 4th', ((date_trunc('day', now() at time zone 'America/Vancouver')
       + (((3 - extract(dow from now() at time zone 'America/Vancouver')::int) + 7) % 7) * interval '1 day'
-      + time '16:00') at time zone 'America/Vancouver'), true, 'Larch Street Kitchen', time '18:30', 3, true),
+      + time '16:00') at time zone 'America/Vancouver'), true, 'Larch Street Kitchen', time '18:30', 3, 'park', true),
   ('00000000-0000-4000-8000-000000000102', '00000000-0000-4000-8000-000000000014', 'Saturday run', 'Easy 5K out and back along the water. Coffee after for anyone who wants it.', 'Move', 'Point Grey Road', ((date_trunc('day', now() at time zone 'America/Vancouver')
       + (((6 - extract(dow from now() at time zone 'America/Vancouver')::int) + 7) % 7) * interval '1 day'
-      + time '09:00') at time zone 'America/Vancouver'), false, '', null, 3, true),
+      + time '09:00') at time zone 'America/Vancouver'), false, '', null, 3, 'shore', true),
   ('00000000-0000-4000-8000-000000000103', '00000000-0000-4000-8000-000000000012', 'Sunset sea swim', 'A short dip near shore. Wetsuits welcome.', 'Move', 'Kits Beach', ((date_trunc('day', now() at time zone 'America/Vancouver')
       + (((2 - extract(dow from now() at time zone 'America/Vancouver')::int) + 7) % 7) * interval '1 day'
-      + time '18:15') at time zone 'America/Vancouver'), false, '', null, 3, true),
+      + time '18:15') at time zone 'America/Vancouver'), false, '', null, 3, 'waves', true),
   ('00000000-0000-4000-8000-000000000104', '00000000-0000-4000-8000-000000000003', 'Founder breakfast', 'Eggs and one honest question each about what’s hard right now. Six seats.', 'Eat', 'West 4th', ((date_trunc('day', now() at time zone 'America/Vancouver')
       + (((5 - extract(dow from now() at time zone 'America/Vancouver')::int) + 7) % 7) * interval '1 day'
-      + time '08:00') at time zone 'America/Vancouver'), false, '', null, 3, true)
+      + time '08:00') at time zone 'America/Vancouver'), false, '', null, 3, 'point', true)
 on conflict (id) do nothing;
 
 insert into public.activity_interests (activity_id, profile_id, dinner) values
@@ -100,12 +100,12 @@ insert into public.update_helpers (update_id, profile_id) values
   ('00000000-0000-4000-8000-000000000213', '00000000-0000-4000-8000-000000000011')
 on conflict  do nothing;
 
-insert into public.spots (id, added_by, name, area, note, tags, is_demo) values
-  ('00000000-0000-4000-8000-000000000301', '00000000-0000-4000-8000-000000000002', 'Tidewater Café', 'West 4th', 'Big tables, good wifi, fine with laptops before 2pm.', array['Coffee','Laptop-friendly']::text[], true),
-  ('00000000-0000-4000-8000-000000000302', '00000000-0000-4000-8000-000000000003', 'Larch Street Kitchen', 'Kitsilano', 'Long tables. Takes groups of eight if you call ahead.', array['Dinner','Groups']::text[], true),
-  ('00000000-0000-4000-8000-000000000303', '00000000-0000-4000-8000-000000000012', 'Kits Beach logs', 'Kits Beach', 'Sunset hangs by the volleyball courts. Bring a layer.', array['Outdoors','Groups']::text[], true),
-  ('00000000-0000-4000-8000-000000000304', '00000000-0000-4000-8000-000000000008', 'The Arbutus Room', 'West Broadway', 'Quiet after-dinner drinks, easier to talk on weeknights.', array['Drinks']::text[], true),
-  ('00000000-0000-4000-8000-000000000305', '00000000-0000-4000-8000-000000000014', 'Kits Pool', 'Kits Beach', 'Laps in summer, then coffee across the street.', array['Fitness','Outdoors']::text[], true)
+insert into public.spots (id, added_by, name, area, note, tags, photo_url, is_demo) values
+  ('00000000-0000-4000-8000-000000000301', '00000000-0000-4000-8000-000000000002', 'Tidewater Café', 'West 4th', 'Big tables, good wifi, fine with laptops before 2pm.', array['Coffee','Laptop-friendly']::text[], 'https://images.unsplash.com/photo-1764391836704-8053c8a6e209?w=900&h=600&fit=crop&q=75&auto=format', true),
+  ('00000000-0000-4000-8000-000000000302', '00000000-0000-4000-8000-000000000003', 'Larch Street Kitchen', 'Kitsilano', 'Long tables. Takes groups of eight if you call ahead.', array['Dinner','Groups']::text[], 'https://images.unsplash.com/photo-1670899460364-ebc917bac09a?w=900&h=600&fit=crop&q=75&auto=format', true),
+  ('00000000-0000-4000-8000-000000000303', '00000000-0000-4000-8000-000000000012', 'Kits Beach logs', 'Kits Beach', 'Sunset hangs by the volleyball courts. Bring a layer.', array['Outdoors','Groups']::text[], 'cover:park', true),
+  ('00000000-0000-4000-8000-000000000304', '00000000-0000-4000-8000-000000000008', 'The Arbutus Room', 'West Broadway', 'Quiet after-dinner drinks, easier to talk on weeknights.', array['Drinks']::text[], 'https://images.unsplash.com/photo-1760982192590-de2b005bb4d5?w=900&h=600&fit=crop&q=75&auto=format', true),
+  ('00000000-0000-4000-8000-000000000305', '00000000-0000-4000-8000-000000000014', 'Kits Pool', 'Kits Beach', 'Laps in summer, then coffee across the street.', array['Fitness','Outdoors']::text[], 'https://images.unsplash.com/photo-1545960122-23d7d68938a6?w=900&h=600&fit=crop&q=75&auto=format', true)
 on conflict (id) do nothing;
 
 insert into public.spot_regulars (spot_id, profile_id) values
@@ -128,9 +128,11 @@ insert into public.spot_regulars (spot_id, profile_id) values
 on conflict  do nothing;
 
 insert into public.takeaways (id, author_id, title, body, is_demo, created_at) values
-  ('00000000-0000-4000-8000-000000000401', '00000000-0000-4000-8000-000000000011', 'Charge from day one', 'Our first shop paid $40 a month before the product was finished. Asking early told us more than any survey did.', true, now() - interval '2 days'),
-  ('00000000-0000-4000-8000-000000000402', '00000000-0000-4000-8000-000000000012', 'Five interviews beat fifty surveys', 'Patterns show up by the fifth conversation. After that you’re mostly hearing them again.', true, now() - interval '9 days'),
-  ('00000000-0000-4000-8000-000000000403', '00000000-0000-4000-8000-000000000001', 'Write the README first', 'If you can’t explain it in a paragraph, you’re not ready to build it.', true, now() - interval '16 days')
+  ('00000000-0000-4000-8000-000000000401', '00000000-0000-4000-8000-000000000011', 'Put a price on it before you build it', 'I pitched the bike-shop tool at $40 a month with nothing but screenshots. Three shops said yes, eleven said no, and the no’s told me exactly which feature to cut.', true, now() - interval '2 days'),
+  ('00000000-0000-4000-8000-000000000402', '00000000-0000-4000-8000-000000000012', 'Ask about last Tuesday, not “would you use this?”', 'People are bad at predicting what they’ll do and good at remembering what they did. “Walk me through the last time this happened” gets you real answers.', true, now() - interval '6 days'),
+  ('00000000-0000-4000-8000-000000000403', '00000000-0000-4000-8000-000000000003', 'Hire for the job in six months, not this week', 'My first engineer was perfect for the prototype and miserable once we had paying customers. Write down what the role looks like at month six, then interview for that.', true, now() - interval '11 days'),
+  ('00000000-0000-4000-8000-000000000404', '00000000-0000-4000-8000-000000000008', 'Your first hundred customers come from one channel', 'Every company I’ve worked with found its first hundred in a single place. Splitting effort across five channels just makes all five look like they don’t work.', true, now() - interval '15 days'),
+  ('00000000-0000-4000-8000-000000000405', '00000000-0000-4000-8000-000000000002', 'Ship the boring version first', 'We spent a month on a real-time sync engine. A nightly CSV export would have shown us in a week that nobody needed real-time.', true, now() - interval '23 days')
 on conflict (id) do nothing;
 
 commit;

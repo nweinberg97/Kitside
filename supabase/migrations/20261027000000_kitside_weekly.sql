@@ -46,14 +46,18 @@ do $$ begin
   end if;
 end $$;
 
--- Sessions (the weekly build session) can carry an optional dinner.
+-- Sessions (the weekly build session) can carry an optional dinner. Every event can pick a banner photo.
 alter table public.activities add column if not exists is_session   boolean not null default false;
 alter table public.activities add column if not exists dinner_place text not null default '';
 alter table public.activities add column if not exists dinner_time  time;
 alter table public.activities add column if not exists dinner_min   int not null default 3;
+alter table public.activities add column if not exists cover        text not null default '';
 do $$ begin
   if not exists (select 1 from pg_constraint where conname = 'activities_dinner_place_check') then
     alter table public.activities add constraint activities_dinner_place_check check (char_length(dinner_place) <= 80) not valid;
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'activities_cover_check') then
+    alter table public.activities add constraint activities_cover_check check (cover ~ '^[a-z-]{0,20}$') not valid;
   end if;
   if not exists (select 1 from pg_constraint where conname = 'activities_dinner_min_check') then
     alter table public.activities add constraint activities_dinner_min_check check (dinner_min between 2 and 12) not valid;
@@ -112,6 +116,14 @@ create table if not exists public.spots (
   is_demo    boolean not null default false,
   created_at timestamptz not null default now()
 );
+
+alter table public.spots add column if not exists photo_url text not null default '';
+do $$ begin
+  if not exists (select 1 from pg_constraint where conname = 'spots_photo_url_check') then
+    alter table public.spots add constraint spots_photo_url_check
+      check (photo_url = '' or (photo_url ~ '^https://[^[:space:]]+$' and char_length(photo_url) <= 400) or photo_url ~ '^cover:[a-z-]{1,20}$') not valid;
+  end if;
+end $$;
 
 -- "I go here."
 create table if not exists public.spot_regulars (

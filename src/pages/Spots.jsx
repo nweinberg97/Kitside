@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { PinIcon } from '../components/PersonCard.jsx';
 import { ChipGroup, DemoTag, EmptyState, ErrorState, Field, Modal, PersonLink, SkeletonGrid } from '../components/ui.jsx';
 import { api } from '../lib/api.js';
-import { SPOT_TAGS } from '../lib/constants.js';
+import { SPOT_TAGS, spotPhoto } from '../lib/constants.js';
 import { firstName } from '../lib/format.js';
 import { useLoad } from '../lib/useLoad.js';
 import { useMemberGate } from '../state/useMemberGate.js';
@@ -69,17 +69,21 @@ function SpotCard({ spot, onRemoved }) {
 
   return (
     <article className="spot-card">
+      <div className="spot-photo">
+        <img src={spotPhoto(spot)} alt="" loading="lazy" referrerPolicy="no-referrer"
+          onError={(e) => { if (!e.currentTarget.dataset.fallback) { e.currentTarget.dataset.fallback = '1'; e.currentTarget.src = spotPhoto({ tags: spot.tags }); } }} />
+        {spot.isDemo && <DemoTag />}
+        {ids.length > 0 && <span className="spot-count">{ids.length} go here</span>}
+      </div>
       <div className="spot-top">
         <h3>{spot.name}</h3>
-        {spot.isDemo && <DemoTag />}
       </div>
       {spot.area && <p className="place"><PinIcon />{spot.area}</p>}
       {spot.note && <p className="spot-note">{spot.note}</p>}
       {spot.tags.length > 0 && <ul className="tags">{spot.tags.map((t) => <li key={t}>{t}</li>)}</ul>}
       <div className="spot-foot">
         <span className="muted small">
-          {ids.length === 0 ? 'Nobody yet' : ids.length === 1 ? '1 member goes here' : `${ids.length} members go here`}
-          {spot.addedByProfile && <> · added by <PersonLink profile={spot.addedByProfile} /></>}
+          {spot.addedByProfile ? <>Added by <PersonLink profile={spot.addedByProfile} /></> : 'Added by a member'}
         </span>
         <span className="spot-actions">
           {canRemove && <button type="button" className="text-btn small" onClick={remove}>Remove</button>}
@@ -93,7 +97,7 @@ function SpotCard({ spot, onRemoved }) {
 function AddSpot({ onClose, onAdded }) {
   const toast = useToast();
   const { profile } = useSession();
-  const [f, setF] = useState({ name: '', area: '', note: '', tags: [] });
+  const [f, setF] = useState({ name: '', area: '', note: '', tags: [], photo: '' });
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const set = (k) => (e) => { setF((x) => ({ ...x, [k]: e.target.value })); setError(''); };
@@ -101,9 +105,10 @@ function AddSpot({ onClose, onAdded }) {
   async function submit(e) {
     e.preventDefault();
     if (!f.name.trim()) return setError('What’s it called?');
+    if (f.photo.trim() && !/^https:\/\/\S+$/.test(f.photo.trim())) return setError('The photo link should start with https://');
     setBusy(true);
     try {
-      const s = await api.createSpot({ name: f.name.trim(), area: f.area.trim(), note: f.note.trim(), tags: f.tags });
+      const s = await api.createSpot({ name: f.name.trim(), area: f.area.trim(), note: f.note.trim(), tags: f.tags, photo: f.photo.trim() });
       onAdded(s);
       toast(`Added. Thanks, ${firstName(profile?.name)}.`);
       onClose();
@@ -119,6 +124,9 @@ function AddSpot({ onClose, onAdded }) {
         </Field>
         <Field label="Why it’s good" htmlFor="s-note" hint={`One line. ${140 - f.note.length} characters left.`}>
           <input id="s-note" maxLength={140} value={f.note} onChange={set('note')} placeholder="Takes groups of six, quiet enough to talk" />
+        </Field>
+        <Field label="Photo link" htmlFor="s-photo" hint="Optional. Paste a link to a photo of the place. Without one, it uses a photo from around Kits.">
+          <input id="s-photo" type="url" maxLength={400} value={f.photo} onChange={set('photo')} placeholder="https://…" />
         </Field>
         <div className="field">
           <span className="field-label">Good for</span>

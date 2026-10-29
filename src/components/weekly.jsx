@@ -1,7 +1,8 @@
 /* Building blocks for the weekly rhythm: updates, asks, the session card, hosting. */
 import { useState } from 'react';
 import { api } from '../lib/api.js';
-import { CATEGORIES, LIMITS } from '../lib/constants.js';
+import { CATEGORIES, COVERS, LIMITS, coverId, coverUrl } from '../lib/constants.js';
+import { DateBadge } from './ActivityCard.jsx';
 import { ago, dayLabel, firstName, timeLabel, toYmd } from '../lib/format.js';
 import { Link } from '../lib/router.jsx';
 import { dinnerIsOn } from '../lib/week.js';
@@ -164,7 +165,9 @@ export function SessionCard({ session, peopleById }) {
 
   return (
     <article className="session">
-      <div className="session-photo" aria-hidden="true" style={{ backgroundImage: `url(${import.meta.env.BASE_URL}img/kits-park-people.jpg)` }} />
+      <div className="session-photo" aria-hidden="true" style={{ backgroundImage: `url(${coverUrl(coverId(session))})` }}>
+        <DateBadge date={session.startsAt} />
+      </div>
       <div className="session-body">
         <p className="session-kicker">{dayLabel(d)} · {timeLabel(d)} {session.isDemo && <DemoTag />}</p>
         <h2>{session.title}</h2>
@@ -212,7 +215,7 @@ export function HostEventDialog({ onClose, onCreated, asSession = false }) {
   const tomorrow = new Date(Date.now() + 864e5);
   const [f, setF] = useState({
     title: asSession ? 'Build & Break Bread' : '', category: asSession ? 'Build' : 'Move', location: '', date: toYmd(tomorrow),
-    time: asSession ? '16:00' : '18:00', description: '', isSession: asSession, dinnerPlace: '', dinnerTime: '18:30', dinnerMin: 3,
+    time: asSession ? '16:00' : '18:00', description: '', isSession: asSession, dinnerPlace: '', dinnerTime: '18:30', dinnerMin: 3, cover: '',
   });
   const [errors, setErrors] = useState({});
   const [busy, setBusy] = useState(false);
@@ -231,7 +234,7 @@ export function HostEventDialog({ onClose, onCreated, asSession = false }) {
     try {
       const a = await api.createActivity({
         title: f.title.trim(), category: f.category, location: f.location.trim(), description: f.description.trim(),
-        startsAt: startsAt.toISOString(), isSession: f.isSession,
+        startsAt: startsAt.toISOString(), isSession: f.isSession, cover: coverId(f),
         dinnerPlace: f.isSession ? f.dinnerPlace.trim() : '', dinnerTime: f.isSession && f.dinnerPlace.trim() ? f.dinnerTime : null,
         dinnerMin: Number(f.dinnerMin) || 3,
       });
@@ -265,6 +268,21 @@ export function HostEventDialog({ onClose, onCreated, asSession = false }) {
         <div className="field-row">
           <Field label="Day" htmlFor="h-date" error={errors.date}><input id="h-date" type="date" value={f.date} onChange={set('date')} /></Field>
           <Field label="Time" htmlFor="h-time"><input id="h-time" type="time" value={f.time} onChange={set('time')} /></Field>
+        </div>
+        <div className="field">
+          <span className="field-label">Banner</span>
+          <div className="cover-picker" role="radiogroup" aria-label="Banner photo">
+            {COVERS.map((c) => {
+              const on = coverId(f) === c.id;
+              return (
+                <button key={c.id} type="button" role="radio" aria-checked={on} aria-label={c.label} title={c.label}
+                  className={`cover-option ${on ? 'is-on' : ''}`} onClick={() => setF((x) => ({ ...x, cover: c.id }))}>
+                  <img src={coverUrl(c.id)} alt="" loading="lazy" />
+                </button>
+              );
+            })}
+          </div>
+          <p className="field-hint">Photos taken around Kits. If you don’t pick one, it matches the kind of event.</p>
         </div>
         <Field label="Details" htmlFor="h-desc" hint="Optional. One or two lines.">
           <textarea id="h-desc" rows={2} maxLength={400} value={f.description} onChange={set('description')} />

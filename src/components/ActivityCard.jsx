@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { api } from '../lib/api.js';
-import { categoryTone } from '../lib/constants.js';
+import { categoryTone, coverId, coverUrl } from '../lib/constants.js';
 import { dayLabel, timeLabel } from '../lib/format.js';
 import { useSession } from '../state/session.jsx';
 import { useToast } from '../state/toast.jsx';
@@ -9,6 +9,18 @@ import MoreMenu from './MoreMenu.jsx';
 import { PinIcon } from './PersonCard.jsx';
 import ReportDialog from './ReportDialog.jsx';
 import { Avatar, DemoTag, PersonLink } from './ui.jsx';
+
+/** The date badge that sits on an event's banner: weekday over a big day number. */
+export function DateBadge({ date }) {
+  const d = new Date(date);
+  return (
+    <span className="date-badge" aria-hidden="true">
+      <span className="date-badge-day">{d.toLocaleDateString('en-CA', { weekday: 'short' })}</span>
+      <span className="date-badge-num">{d.getDate()}</span>
+      <span className="date-badge-mon">{d.toLocaleDateString('en-CA', { month: 'short' })}</span>
+    </span>
+  );
+}
 
 export default function ActivityCard({ activity, compact = false, onDeleted }) {
   const { user } = useSession();
@@ -28,14 +40,17 @@ export default function ActivityCard({ activity, compact = false, onDeleted }) {
 
   return (
     <article className={`activity-card tone-${categoryTone(activity.category)} ${compact ? 'is-compact' : ''}`}>
-      <div className="date-tag" aria-hidden="true">
-        <span className="date-tag-day">{d.toLocaleDateString('en-CA', { weekday: 'short' })}</span>
-        <span className="date-tag-num">{d.getDate()}</span>
+      <div className="activity-banner">
+        <img src={coverUrl(coverId(activity))} alt="" loading="lazy" />
+        <DateBadge date={activity.startsAt} />
+        <span className="banner-tags">
+          <span className="category category-chip">{activity.category}</span>
+          {activity.isDemo && <DemoTag />}
+        </span>
       </div>
       <div className="activity-body">
-        <div className="activity-meta">
-          <span className="category">{activity.category}</span>
-          {activity.isDemo && <DemoTag />}
+        <div className="activity-title-row">
+          <h3>{activity.title}</h3>
           {!compact && (
             <MoreMenu items={[
               isHost && { label: 'Cancel event', danger: true, onSelect: remove },
@@ -43,7 +58,6 @@ export default function ActivityCard({ activity, compact = false, onDeleted }) {
             ]} />
           )}
         </div>
-        <h3>{activity.title}</h3>
         <p className="activity-when">
           <time dateTime={activity.startsAt}>{dayLabel(d)}, {timeLabel(d)}</time>
           <span className="place"><PinIcon />{activity.location}</span>
