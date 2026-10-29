@@ -521,6 +521,7 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--b
 /* Takeaways */
 .takeaways { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
 .takeaway { padding: 22px 24px; background: var(--paper); border: 1px solid var(--line-2); border-left: 4px solid var(--sun); border-radius: 18px; display: grid; gap: 8px; }
+.takeaway-context { font-size: 12.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--kelp); }
 .takeaway h2 { font-size: 24px; font-weight: 700; letter-spacing: -.025em; }
 .takeaway p { color: var(--ink-2); font-size: 16.5px; max-width: 60ch; }
 .takeaway footer { display: flex; align-items: center; gap: 8px; font-size: 14px; margin-top: 4px; }

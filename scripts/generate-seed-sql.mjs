@@ -40,8 +40,8 @@ out.push(insert('update_helpers', 'update_id, profile_id', DEMO_UPDATES.flatMap(
 out.push(insert('spots', 'id, added_by, name, area, note, tags, photo_url, is_demo',
   DEMO_SPOTS.map((s) => `  (${q(s.id)}, ${q(s.addedBy)}, ${q(s.name)}, ${q(s.area)}, ${q(s.note)}, ${arr(s.tags)}, ${q(s.photo || '')}, true)`)));
 out.push(insert('spot_regulars', 'spot_id, profile_id', DEMO_SPOTS.flatMap((s) => s.regulars.map((p) => `  (${q(s.id)}, ${q(p)})`)), ''));
-out.push(insert('takeaways', 'id, author_id, title, body, is_demo, created_at',
-  DEMO_TAKEAWAYS.map((t) => `  (${q(t.id)}, ${q(t.authorId)}, ${q(t.title)}, ${q(t.body)}, true, now() - interval '${t.daysAgo} days')`)));
+out.push(insert('takeaways', 'id, author_id, title, body, context, is_demo, created_at',
+  DEMO_TAKEAWAYS.map((t) => `  (${q(t.id)}, ${q(t.authorId)}, ${q(t.title)}, ${q(t.body)}, ${q(t.context || '')}, true, now() - interval '${t.daysAgo} days')`)));
 out.push('commit;\n');
 
 const target = fileURLToPath(new URL('../supabase/seed.sql', import.meta.url));

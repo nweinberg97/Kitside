@@ -26,7 +26,7 @@ export default function Takeaways() {
       <header className="page-head page-head-row">
         <div>
           <h1>Takeaways</h1>
-          <p>A tool, a lesson, a way of working that came up and is worth keeping. Most weeks there won’t be one, and that’s fine.</p>
+          <p>Lessons members actually learned, with the story behind them. Saved when something useful comes up at the table. Most weeks there won’t be one, and that’s fine.</p>
         </div>
         <button className="btn btn-primary" onClick={() => gate('save a takeaway') && setAdding(true)}>Save a takeaway</button>
       </header>
@@ -37,6 +37,7 @@ export default function Takeaways() {
         <ol className="takeaways">
           {list.map((t) => (
             <li key={t.id} className="takeaway">
+              {t.context && <p className="takeaway-context">Came up at {t.context}</p>}
               <h2>{t.title}</h2>
               {t.body && <p>{t.body}</p>}
               <footer>
@@ -60,7 +61,7 @@ export default function Takeaways() {
 
 function AddTakeaway({ onClose, onAdded }) {
   const toast = useToast();
-  const [f, setF] = useState({ title: '', body: '' });
+  const [f, setF] = useState({ title: '', body: '', context: '' });
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -78,11 +79,14 @@ function AddTakeaway({ onClose, onAdded }) {
   return (
     <Modal title="Save a takeaway" onClose={onClose}>
       <form className="stack" onSubmit={submit} noValidate>
-        <Field label="The takeaway" htmlFor="t-title" hint="A few words. For example: “Charge from day one”.">
+        <Field label="The takeaway" htmlFor="t-title" hint="One line someone could act on. For example: “Ask what they did instead”.">
           <input id="t-title" maxLength={80} value={f.title} onChange={(e) => { setF({ ...f, title: e.target.value }); setError(''); }} />
         </Field>
-        <Field label="Why it matters" htmlFor="t-body" hint={`Optional. ${280 - f.body.length} characters left.`}>
-          <textarea id="t-body" rows={3} maxLength={280} value={f.body} onChange={(e) => setF({ ...f, body: e.target.value })} />
+        <Field label="What happened" htmlFor="t-body" hint={`The real example behind it: numbers, what you tried, what changed. ${280 - f.body.length} characters left.`}>
+          <textarea id="t-body" rows={4} maxLength={280} value={f.body} onChange={(e) => setF({ ...f, body: e.target.value })} />
+        </Field>
+        <Field label="Where it came up" htmlFor="t-context" hint="Optional. For example: Build & Break Bread, or Founder breakfast.">
+          <input id="t-context" maxLength={60} value={f.context} onChange={(e) => setF({ ...f, context: e.target.value })} />
         </Field>
         {error && <p className="form-error" role="alert">{error}</p>}
         <div className="modal-actions">

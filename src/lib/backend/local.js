@@ -10,12 +10,21 @@
  */
 import { MODE } from '../config.js';
 import {
-  DEMO_ACTIVITIES, DEMO_INVITE, DEMO_PROFILES, DEMO_SPOTS, DEMO_TAKEAWAYS, DEMO_UPDATES, nextOccurrence,
+  DEMO_ACTIVITIES, DEMO_INVITE, DEMO_PROFILES, DEMO_SPOTS, DEMO_TAKEAWAYS, DEMO_UPDATES, SEED_VERSION, nextOccurrence,
 } from '../seed.js';
 import { LIMITS, inviteCap } from '../constants.js';
 
 // The demo sandbox and local preview keep separate copies.
-const KEY = MODE === 'demo' ? 'kitside:demo:v2' : 'kitside:preview:v2';
+const PREFIX = MODE === 'demo' ? 'kitside:demo:v' : 'kitside:preview:v';
+const KEY = `${PREFIX}${SEED_VERSION}`;
+
+// Drop copies made from older demo content, so changes to the sample data always show up.
+try {
+  for (let i = localStorage.length - 1; i >= 0; i--) {
+    const k = localStorage.key(i);
+    if (k?.startsWith(PREFIX) && k !== KEY) localStorage.removeItem(k);
+  }
+} catch { /* storage blocked */ }
 const listeners = new Set();
 const wait = (ms = 120) => new Promise((r) => setTimeout(r, ms)); // makes loading states visible, like a network would
 const HOUR = 3600e3;
@@ -46,7 +55,7 @@ function freshDb() {
     })),
     spotRegulars: DEMO_SPOTS.flatMap((s) => s.regulars.map((p) => ({ spotId: s.id, profileId: p }))),
     takeaways: DEMO_TAKEAWAYS.map((t) => ({
-      id: t.id, authorId: t.authorId, title: t.title, body: t.body, isDemo: true,
+      id: t.id, authorId: t.authorId, title: t.title, body: t.body, context: t.context || '', isDemo: true,
       createdAt: new Date(now - t.daysAgo * DAY).toISOString(),
     })),
     blocks: [],
@@ -429,10 +438,10 @@ export const localBackend = {
     return [...getDb().takeaways].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).map(hydrateTakeaway);
   },
 
-  async createTakeaway({ title, body }) {
+  async createTakeaway({ title, body, context = '' }) {
     await wait();
     const me = requireMember();
-    const t = { id: uid(), authorId: me.id, title: title.trim(), body: body.trim(), isDemo: false, createdAt: new Date().toISOString() };
+    const t = { id: uid(), authorId: me.id, title: title.trim(), body: body.trim(), context: context.trim(), isDemo: false, createdAt: new Date().toISOString() };
     getDb().takeaways.push(t);
     commit();
     return hydrateTakeaway(t);

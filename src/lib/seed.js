@@ -158,6 +158,9 @@ export const DEMO_PROFILES = [
 
 const pid = (n) => id(n);
 
+/** Bump when demo content changes, so browsers holding an older copy refresh it. */
+export const SEED_VERSION = 4;
+
 /** Invite code that works in the demo sandbox. */
 export const DEMO_INVITE = 'KITS-DEMO';
 
@@ -213,11 +216,12 @@ export const DEMO_SPOTS = [
 ].map((s) => ({ ...s, id: id(s.n), addedBy: pid(s.by), regulars: s.regulars.map(pid), isDemo: true }));
 
 export const DEMO_TAKEAWAYS = [
-  { n: 401, author: 11, daysAgo: 2, title: 'Put a price on it before you build it', body: 'I pitched the bike-shop tool at $40 a month with nothing but screenshots. Three shops said yes, eleven said no, and the no’s told me exactly which feature to cut.' },
-  { n: 402, author: 12, daysAgo: 6, title: 'Ask about last Tuesday, not “would you use this?”', body: 'People are bad at predicting what they’ll do and good at remembering what they did. “Walk me through the last time this happened” gets you real answers.' },
-  { n: 403, author: 3, daysAgo: 11, title: 'Hire for the job in six months, not this week', body: 'My first engineer was perfect for the prototype and miserable once we had paying customers. Write down what the role looks like at month six, then interview for that.' },
-  { n: 404, author: 8, daysAgo: 15, title: 'Your first hundred customers come from one channel', body: 'Every company I’ve worked with found its first hundred in a single place. Splitting effort across five channels just makes all five look like they don’t work.' },
-  { n: 405, author: 2, daysAgo: 23, title: 'Ship the boring version first', body: 'We spent a month on a real-time sync engine. A nightly CSV export would have shown us in a week that nobody needed real-time.' },
+  { n: 401, author: 11, daysAgo: 2, context: 'Build & Break Bread', title: 'Kill the free plan sooner than feels safe', body: 'We had 40 free shops and 3 paying. Ending free signups doubled paid conversions within a month and cut support email in half. Free users weren’t a funnel. They were a second job.' },
+  { n: 402, author: 12, daysAgo: 5, context: 'Dinner at Larch Street Kitchen', title: 'Ask what they did instead', body: 'When someone says a problem is painful, ask how they handled it last time. If the answer is “nothing”, it isn’t painful enough to pay for. If it’s a messy spreadsheet, you’ve found a customer.' },
+  { n: 403, author: 3, daysAgo: 9, context: 'Founder breakfast', title: 'Hire from companies 10x your size, not 100x', body: 'People from big companies expect the scaffolding to already exist. Someone from a 30-person startup has built it themselves, and at four people that’s the actual job.' },
+  { n: 404, author: 1, daysAgo: 13, context: 'Build & Break Bread', title: 'Sell the service first, then the tool', body: 'Teams wouldn’t pay for my accessibility checker. They paid $1,500 for a one-off audit, and half of them then asked for the tool to stay compliant. The audits are funding the product.' },
+  { n: 405, author: 2, daysAgo: 18, context: 'Saturday run', title: 'Demo every Friday, even when it’s ugly', body: 'Our team of three swapped status updates for a 10-minute Friday demo. A week with nothing to show becomes obvious by Wednesday, which is when you can still fix it.' },
+  { n: 406, author: 8, daysAgo: 24, context: 'Build & Break Bread', title: 'Write the launch post before you build', body: 'If the announcement is boring to write, the feature will be boring to use. One client cut their quarter’s roadmap in half this way, before writing any code.' },
 ].map((t) => ({ ...t, id: id(t.n), authorId: pid(t.author), isDemo: true }));
 
 /** Next occurrence (local time) of a weekday at HH:MM, today included if still ahead. */

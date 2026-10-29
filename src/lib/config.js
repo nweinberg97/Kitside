@@ -29,7 +29,11 @@ export const MODE = IN_DEMO ? 'demo' : IS_LIVE ? 'live' : 'preview';
 export function enterDemo(to = '/') {
   try {
     window.localStorage.setItem(DEMO_FLAG, '1');
-    window.localStorage.removeItem('kitside:demo:v2'); // every visit starts from fresh sample data
+    // Every visit starts from fresh sample data.
+    for (let i = window.localStorage.length - 1; i >= 0; i--) {
+      const k = window.localStorage.key(i);
+      if (k?.startsWith('kitside:demo:v')) window.localStorage.removeItem(k);
+    }
   } catch { /* storage blocked: the demo can't switch on */ }
   window.location.hash = to;
   window.location.reload();

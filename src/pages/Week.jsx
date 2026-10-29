@@ -111,7 +111,7 @@ export default function Week() {
                 <Link to="/takeaways" className="extra-card">
                   <span className="eyebrow">Latest takeaway</span>
                   <strong>{view.takeaway.title}</strong>
-                  <span className="muted">{firstName(view.takeaway.author?.name)}</span>
+                  <span className="muted">{firstName(view.takeaway.author?.name)}{view.takeaway.context ? ` · ${view.takeaway.context}` : ''}</span>
                 </Link>
               )}
               {view.spot && (

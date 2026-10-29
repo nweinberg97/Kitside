@@ -143,6 +143,14 @@ create table if not exists public.takeaways (
   created_at timestamptz not null default now()
 );
 
+-- Where a takeaway came up (optional): "Build & Break Bread", "Founder breakfast".
+alter table public.takeaways add column if not exists context text not null default '';
+do $$ begin
+  if not exists (select 1 from pg_constraint where conname = 'takeaways_context_check') then
+    alter table public.takeaways add constraint takeaways_context_check check (char_length(context) <= 60) not valid;
+  end if;
+end $$;
+
 -- ---------------------------------------------------------------------------
 -- Helpers. SECURITY DEFINER so policies can ask "is this person a member?"
 -- without tripping over the profiles table's own policies.

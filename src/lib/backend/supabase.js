@@ -66,7 +66,7 @@ const toSpot = (r) => ({
 });
 
 const toTakeaway = (r) => ({
-  id: r.id, authorId: r.author_id, author: toProfile(r.author), title: r.title, body: r.body || '',
+  id: r.id, authorId: r.author_id, author: toProfile(r.author), title: r.title, body: r.body || '', context: r.context || '',
   isDemo: !!r.is_demo, createdAt: r.created_at,
 });
 
@@ -316,9 +316,9 @@ export const supabaseBackend = {
     return data.map(toTakeaway);
   },
 
-  async createTakeaway({ title, body }) {
+  async createTakeaway({ title, body, context = '' }) {
     const user = await requireUser();
-    const { data, error } = await sb.from('takeaways').insert({ author_id: user.id, title: title.trim(), body: body.trim() })
+    const { data, error } = await sb.from('takeaways').insert({ author_id: user.id, title: title.trim(), body: body.trim(), context: context.trim() })
       .select('*, author:profiles!takeaways_author_id_fkey(*)').single();
     fail(error);
     return toTakeaway(data);
