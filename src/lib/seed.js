@@ -159,7 +159,7 @@ export const DEMO_PROFILES = [
 const pid = (n) => id(n);
 
 /** Bump when demo content changes, so browsers holding an older copy refresh it. */
-export const SEED_VERSION = 4;
+export const SEED_VERSION = 5;
 
 /** Invite code that works in the demo sandbox. */
 export const DEMO_INVITE = 'KITS-DEMO';
@@ -215,13 +215,12 @@ export const DEMO_SPOTS = [
   { n: 305, by: 14, photo: UNSPLASH('1545960122-23d7d68938a6'), name: 'Kits Pool', area: 'Kits Beach', note: 'Laps in summer, then coffee across the street.', tags: ['Fitness', 'Outdoors'], regulars: [14, 12] },
 ].map((s) => ({ ...s, id: id(s.n), addedBy: pid(s.by), regulars: s.regulars.map(pid), isDemo: true }));
 
+// Three themes founders keep coming back to: building alone too long,
+// mistaking posting for distribution, and how isolating the work is.
 export const DEMO_TAKEAWAYS = [
-  { n: 401, author: 11, daysAgo: 2, context: 'Build & Break Bread', title: 'Kill the free plan sooner than feels safe', body: 'We had 40 free shops and 3 paying. Ending free signups doubled paid conversions within a month and cut support email in half. Free users weren’t a funnel. They were a second job.' },
-  { n: 402, author: 12, daysAgo: 5, context: 'Dinner at Larch Street Kitchen', title: 'Ask what they did instead', body: 'When someone says a problem is painful, ask how they handled it last time. If the answer is “nothing”, it isn’t painful enough to pay for. If it’s a messy spreadsheet, you’ve found a customer.' },
-  { n: 403, author: 3, daysAgo: 9, context: 'Founder breakfast', title: 'Hire from companies 10x your size, not 100x', body: 'People from big companies expect the scaffolding to already exist. Someone from a 30-person startup has built it themselves, and at four people that’s the actual job.' },
-  { n: 404, author: 1, daysAgo: 13, context: 'Build & Break Bread', title: 'Sell the service first, then the tool', body: 'Teams wouldn’t pay for my accessibility checker. They paid $1,500 for a one-off audit, and half of them then asked for the tool to stay compliant. The audits are funding the product.' },
-  { n: 405, author: 2, daysAgo: 18, context: 'Saturday run', title: 'Demo every Friday, even when it’s ugly', body: 'Our team of three swapped status updates for a 10-minute Friday demo. A week with nothing to show becomes obvious by Wednesday, which is when you can still fix it.' },
-  { n: 406, author: 8, daysAgo: 24, context: 'Build & Break Bread', title: 'Write the launch post before you build', body: 'If the announcement is boring to write, the feature will be boring to use. One client cut their quarter’s roadmap in half this way, before writing any code.' },
+  { n: 401, author: 11, daysAgo: 3, context: 'Build & Break Bread', title: 'I built for eight months before talking to a single bike shop', body: 'Turns out they didn’t want inventory software. They wanted to stop losing special orders. One afternoon walking into shops on West 4th taught me more than eight months alone in my apartment.' },
+  { n: 402, author: 8, daysAgo: 8, context: 'Dinner at Larch Street Kitchen', title: 'Posting every day got me likes, not customers', body: 'Three months of daily posts: lots of likes, zero sales. Then I messaged 20 people who actually had the problem and asked for 15 minutes each. Four of them became customers.' },
+  { n: 403, author: 3, daysAgo: 15, context: 'Build & Break Bread', title: 'The work wasn’t the hard part. Doing it alone was.', body: 'My first company worked and I was miserable. Nobody around me knew what a bad week felt like. This time I have one rule: never more than a week without sitting next to other people building something.' },
 ].map((t) => ({ ...t, id: id(t.n), authorId: pid(t.author), isDemo: true }));
 
 /** Next occurrence (local time) of a weekday at HH:MM, today included if still ahead. */
