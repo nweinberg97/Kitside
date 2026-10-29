@@ -159,7 +159,7 @@ export const DEMO_PROFILES = [
 const pid = (n) => id(n);
 
 /** Bump when demo content changes, so browsers holding an older copy refresh it. */
-export const SEED_VERSION = 5;
+export const SEED_VERSION = 6;
 
 /** Invite code that works in the demo sandbox. */
 export const DEMO_INVITE = 'KITS-DEMO';
@@ -215,12 +215,11 @@ export const DEMO_SPOTS = [
   { n: 305, by: 14, photo: UNSPLASH('1545960122-23d7d68938a6'), name: 'Kits Pool', area: 'Kits Beach', note: 'Laps in summer, then coffee across the street.', tags: ['Fitness', 'Outdoors'], regulars: [14, 12] },
 ].map((s) => ({ ...s, id: id(s.n), addedBy: pid(s.by), regulars: s.regulars.map(pid), isDemo: true }));
 
-// Three themes founders keep coming back to: building alone too long,
-// mistaking posting for distribution, and how isolating the work is.
+// Practical, local, usable this week: money, hiring, getting replies.
 export const DEMO_TAKEAWAYS = [
-  { n: 401, author: 11, daysAgo: 3, context: 'Build & Break Bread', title: 'I built for eight months before talking to a single bike shop', body: 'Turns out they didn’t want inventory software. They wanted to stop losing special orders. One afternoon walking into shops on West 4th taught me more than eight months alone in my apartment.' },
-  { n: 402, author: 8, daysAgo: 8, context: 'Dinner at Larch Street Kitchen', title: 'Posting every day got me likes, not customers', body: 'Three months of daily posts: lots of likes, zero sales. Then I messaged 20 people who actually had the problem and asked for 15 minutes each. Four of them became customers.' },
-  { n: 403, author: 3, daysAgo: 15, context: 'Build & Break Bread', title: 'The work wasn’t the hard part. Doing it alone was.', body: 'My first company worked and I was miserable. Nobody around me knew what a bad week felt like. This time I have one rule: never more than a week without sitting next to other people building something.' },
+  { n: 401, author: 3, daysAgo: 3, context: 'Founder breakfast', title: 'SR&ED can refund up to 35% of what you pay to build', body: 'If you’re a Canadian-controlled private corporation paying salaries to solve technical problems, part of it comes back as a refundable credit, even before revenue. Keep a running log of what you tried and what failed. That log is most of the claim.' },
+  { n: 402, author: 11, daysAgo: 8, context: 'Build & Break Bread', title: 'Call IRAP before you post the job', body: 'Hiring a recent grad under 30? NRC IRAP’s youth program can cost-share their salary for 6 to 12 months. You need an IRAP advisor first, so call 1-877-994-4727 before you hire, not after.' },
+  { n: 403, author: 8, daysAgo: 12, context: 'Dinner at Larch Street Kitchen', title: 'The cold message that gets replies', body: '“Hi Sam, I’m building a booking tool for physio clinics. You’ve run one for years. Could I ask you three questions on a 15-minute call? Happy to share what I hear from other clinics.” Name what they know, keep it short, give something back.' },
 ].map((t) => ({ ...t, id: id(t.n), authorId: pid(t.author), isDemo: true }));
 
 /** Next occurrence (local time) of a weekday at HH:MM, today included if still ahead. */
