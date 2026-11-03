@@ -1,0 +1,23 @@
+# Temporary: builds the site into this branch so a screenshot can be taken. Delete after use.
+name: Temp build for screenshot
+on:
+  push:
+    branches: [tmp-screenshot-build]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - run: npm run build
+      - run: |
+          git config user.name "build-bot"
+          git config user.email "build-bot@users.noreply.github.com"
+          git add -f dist
+          git commit -m "Built dist for screenshot"
+          git push origin HEAD:tmp-screenshot-build
